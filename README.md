@@ -7,7 +7,7 @@
   <img src="https://img.shields.io/badge/Cypress-69D3A7?logo=cypress&logoColor=fff"/>
 </p>
 
-![alt text](https://ibb.co/ww7WqYS)
+<img src="https://i.ibb.co/rc36hvx/logo-easy.png" />
 
 <h1>
   Yoda<br>
