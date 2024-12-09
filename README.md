@@ -7,6 +7,8 @@
   <img src="https://img.shields.io/badge/Cypress-69D3A7?logo=cypress&logoColor=fff"/>
 </p>
 
+![alt text](https://ibb.co/ww7WqYS)
+
 <h1>
   Yoda<br>
 </h1>
@@ -21,7 +23,7 @@
 
 # Documentation
 
-for more information visit the [documentation]() folder
+for more information visit the [documentation](https://github.com/BraindeadHermit/yoda/tree/main/docs) folder
 
 # Installation
 
