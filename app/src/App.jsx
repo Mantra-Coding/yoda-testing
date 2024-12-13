@@ -3,9 +3,13 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { Button } from './components/ui/button'
+import app from './firebase/firebase'
 
 function App() {
   const [count, setCount] = useState(0)
+  const db = app;
+  console.log(db);
+
 
   return (
     <>
