@@ -1,11 +1,12 @@
-import { Search, Bell, User } from 'lucide-react'
+import { Search, Bell, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
   return (
     <header className="bg-white border-b border-green-200 px-6 py-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          <h1 className="text-2xl font-bold text-[#178563]">Yoda</h1>
+          <Link to = "/"><h1 className="text-2xl font-bold text-[#178563]">Yoda</h1></Link>
           <span className="ml-2 text-sm text-green-600">Piattaforma di Mentorship</span>
         </div>
         <div className="flex-1 max-w-xl mx-8">

@@ -1,12 +1,24 @@
+"use client";
+
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import Header from "@/components/ui/Header";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { registerUser } from "../../auth/user-registration"; // Import della funzione di registrazione
 
-export default function RegistrationPage() {
+export default function RegistrationForm() {
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     nome: "",
     cognome: "",
@@ -15,26 +27,38 @@ export default function RegistrationPage() {
     dataNascita: "",
     genere: "",
   });
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
-  const handleInputChange = async (e) => {
+  const [error, setError] = useState(""); // Stato per errori
+  const [successMessage, setSuccessMessage] = useState(""); // Stato per successi
+
+  // Gestore di cambio input
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Passaggio al passo successivo
+  const handleNext = () => setStep(2);
+
+  // Passaggio al passo precedente
+  const handleBack = () => setStep(1);
+
+  // Gestione della registrazione
   const handleRegister = async () => {
-    setError("");
-    setSuccessMessage("");
+    setError(""); // Resetta gli errori
+    setSuccessMessage(""); // Resetta il messaggio di successo
 
-    // Costruisci i dati aggiuntivi
-    const additionalData = {
-      displayName: `${formData.nome} ${formData.cognome}`,
-    };
+    // Chiamata alla funzione di registrazione
+    const result = await registerUser(
+      formData.nome,
+      formData.cognome,
+      formData.email,
+      formData.password,
+      formData.genere,
+      formData.dataNascita
+    );
 
-    // Chiama la funzione di registrazione
-    const result = await registerUser(formData.email, formData.password, additionalData);
-
+    // Verifica del risultato della registrazione
     if (result.success) {
       setSuccessMessage("Registrazione effettuata con successo! Benvenuto!");
     } else {
@@ -45,7 +69,7 @@ export default function RegistrationPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-600 to-emerald-100">
       {/* Header */}
-      <Header />
+      <Header/>
 
       {/* Registration Form */}
       <main className="container mx-auto py-8 px-4">
@@ -59,56 +83,109 @@ export default function RegistrationPage() {
             </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            {step === 1 ? (
+              /* Step 1 */
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="nome">Nome</Label>
+                    <Input
+                      id="nome"
+                      name="nome"
+                      value={formData.nome}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="cognome">Cognome</Label>
+                    <Input
+                      id="cognome"
+                      name="cognome"
+                      value={formData.cognome}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
                 <div>
-                  <Label htmlFor="nome">Nome</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
-                    id="nome"
-                    name="nome"
-                    value={formData.nome}
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
                     onChange={handleInputChange}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="cognome">Cognome</Label>
+                  <Label htmlFor="password">Password</Label>
                   <Input
-                    id="cognome"
-                    name="cognome"
-                    value={formData.cognome}
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
                     onChange={handleInputChange}
                   />
                 </div>
+                <div>
+                  <Label htmlFor="dataNascita">Data di Nascita</Label>
+                  <Input
+                    id="dataNascita"
+                    name="dataNascita"
+                    type="date"
+                    value={formData.dataNascita}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <Label>Genere</Label>
+                  <RadioGroup
+                    name="genere"
+                    value={formData.genere}
+                    onValueChange={(value) =>
+                      setFormData(prev => ({ ...prev, genere: value }))
+                    }
+                    className="flex flex-col space-y-1 mt-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="uomo" id="uomo" />
+                      <Label htmlFor="uomo">Uomo</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="donna" id="donna" />
+                      <Label htmlFor="donna">Donna</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="altro" id="altro" />
+                      <Label htmlFor="altro">Altro</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                <Button
+                  onClick={handleNext}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700"
+                >
+                  Avanti
+                </Button>
               </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
+            ) : (
+              /* Step 2 */
+              <div className="space-y-4">
+                <div className="flex gap-4">
+                  <Button variant="outline" onClick={handleBack} className="flex-1">
+                    Indietro
+                  </Button>
+                  <Button
+                    type="submit"
+                    onClick={handleRegister}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    Registrati
+                  </Button>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <Button
-                className="w-full bg-emerald-600 hover:bg-emerald-700"
-                onClick={handleRegister}
-              >
-                Registrati
-              </Button>
-              {error && <p className="text-red-600">{error}</p>}
-              {successMessage && <p className="text-green-600">{successMessage}</p>}
-            </div>
+            )}
+            {error && <p className="text-red-600">{error}</p>}
+            {successMessage && <p className="text-green-600">{successMessage}</p>}
           </CardContent>
         </Card>
       </main>
