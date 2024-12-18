@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock } from "lucide-react"; // Icone
-import Header from "@/components/ui/Header"; // Import del componente Header
 import Logo from "../assets/images/logo_easy.png"; // Import del logo
 
 export default function LoginPage() {
