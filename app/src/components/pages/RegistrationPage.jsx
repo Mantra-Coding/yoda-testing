@@ -105,6 +105,7 @@ function RegistrationForm() {
     <>
     <div className="min-h-screen bg-gradient-to-b from-[#178563] to-white text-black">
       <Header />
+      <div className="mt-8"></div>
         <Card className="mx-auto max-w-2xl border-[#178563] border-2 bg-white backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-[#178563]">Registrazione Mentore o Mentee</CardTitle>
@@ -344,7 +345,8 @@ function RegistrationForm() {
                       name="cv"
                       type="file"
                       onChange={handleFileChange}
-                      className="cursor-pointer file:bg-emerald-50 file:text-emerald-600 file:border-0 file:rounded-md file:px-4 file:py-2 file:mr-4 file:cursor-pointer hover:file:bg-emerald-100 focus:ring-[#178563] focus:border-[#178563]"
+                      className="w-full cursor-pointer file:bg-emerald-50 file:text-emerald-600 file:border-0 file:rounded-md file:px-4 file:py-2 file:mr-4 file:cursor-pointer hover:file:bg-emerald-100 focus:ring-[#178563] focus:border-[#178563] mb-6"
+                      style={{ paddingTop: '15px', paddingBottom: '48px' }}
                     />
                   </div>
                   <div className="space-y-2">
