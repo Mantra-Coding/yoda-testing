@@ -106,8 +106,8 @@ function RegistrationForm() {
 
   return (
     <>
+    <div className="min-h-screen bg-gradient-to-b from-[#178563] to-white text-black">
       <Header />
-      <div className="min-h-screen bg-gradient-to-b from-[#178563] to-white backdrop-blur-sm p-4">
         <Card className="mx-auto max-w-2xl border-[#178563] border-2 bg-white backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-[#178563]">Registrazione Mentore o Mentee</CardTitle>

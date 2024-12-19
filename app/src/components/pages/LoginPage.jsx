@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock } from "lucide-react";
 import Logo from "../assets/images/logo_easy.png";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -13,7 +15,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState(""); // Stato per il messaggio di successo
   const navigate = useNavigate();
-  const location = useLocation(); // Ottieni lo stato della navigazione
+  const location = useLocation();
+  const db = getFirestore(); // Ottieni lo stato della navigazione
 
   useEffect(() => {
     // Controlla se esiste un messaggio nello stato della navigazione
@@ -25,16 +28,67 @@ export default function LoginPage() {
   }, [location, navigate]);
 
   const handleLogin = async () => {
-    setError(""); // Reset dell'errore
-
-    const result = await loginUser(email, password);
-    if (result.success) {
-      navigate("/"); // Reindirizza alla home page
-    } else {
-      setError(result.error);
+    try {
+      setError(""); // Reset dell'errore
+      console.log("Avvio del processo di login");
+  
+      // Chiamata alla funzione di login
+      const result = await loginUser(email, password);
+      console.log("Risultato login:", result);
+  
+      if (result.success) {
+        console.log("Utente autenticato con successo. ID utente:", result.userId);
+  
+        // Recupera informazioni aggiuntive da Firestore, ma solo i campi necessari
+        const db = getFirestore();
+        const userDocRef = doc(db, "utenti", result.userId);
+        console.log("Riferimento al documento utente:", userDocRef.path);
+  
+        const userDoc = await getDoc(userDocRef);
+        console.log("Dati recuperati da Firestore:", userDoc);
+  
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          console.log("Dati utente recuperati da Firestore:", userData);
+  
+          // Recupera solo nome e userType
+          const userName = userData?.nome;
+          const userType = userData?.userType;
+  
+          // Verifica che nome e userType siano presenti
+          if (userName && userType) {
+            console.log("Nome utente:", userName);
+            console.log("Tipo di utente:", userType);
+  
+            // Naviga in base al tipo di utente
+            if (userType === "mentee") {
+              console.log("Tipo di utente: mentee. Navigo verso '/dettaglimentee'");
+              navigate("/dettaglimentee", { state: { userName, userType } });
+            } else if (userType === "mentor") {
+              console.log("Tipo di utente: mentor. Navigo verso '/dettaglimentore'");
+              navigate("/dettaglimentore", { state: { userName, userType } });
+            } else {
+              console.error("Tipo di utente non riconosciuto:", userType);
+              setError("Tipo di utente non riconosciuto.");
+            }
+          } else {
+            console.error("Errore: nome o userType assenti nei dati utente.", userData);
+            setError("I dati utente non sono completi.");
+          }
+        } else {
+          console.error("Dati utente non trovati in Firestore per ID:", result.userId);
+          setError("Dati utente non trovati in Firestore.");
+        }
+      } else {
+        console.error("Errore nel login:", result.error);
+        setError(result.error);
+      }
+    } catch (err) {
+      console.error("Errore durante il login:", err);
+      setError("Si è verificato un errore. Riprova.");
     }
   };
-
+  
   return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
       <div className="flex items-center justify-center bg-[#0E8D6D] p-8">
