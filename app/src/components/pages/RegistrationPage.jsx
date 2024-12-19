@@ -33,6 +33,8 @@ function RegistrationForm() {
   const [portfolioProjects, setPortfolioProjects] = useState([])
   const [newProject, setNewProject] = useState({ name: '', description: '', url: '' })
   const [showPortfolioForm, setShowPortfolioForm] = useState(false)
+  const [feedbackMessage, setFeedbackMessage] = useState(null);
+  const [feedbackType, setFeedbackType] = useState(null); // Tipo di feedback (successo o errore)
   const [errors, setErrors] = useState({})
 
   const handleInputChange = (e) => {
@@ -82,27 +84,22 @@ function RegistrationForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
+  
     try {
       const response = await registerUser(formData, portfolioProjects);
       if (response.success) {
-        toast({
-          title: "Registrazione completata con successo!",
-          description: "Il tuo account è stato creato.",
-        });
+        setFeedbackMessage("Registrazione completata con successo! Il tuo account è stato creato.");
+        setFeedbackType("success");
       } else {
         throw new Error(response.error);
       }
     } catch (err) {
-      console.error(err);
-      toast({
-        title: "Registrazione fallita",
-        description: "Si è verificato un errore durante la registrazione. Per favore riprova.",
-        variant: "destructive",
-      });
+      setFeedbackMessage(err.message || "Errore durante la registrazione. Per favore riprova.");
+      setFeedbackType("error");
     }
   };
-
+  
+  
 
   return (
     <>
@@ -114,6 +111,58 @@ function RegistrationForm() {
             <CardDescription>Compila il form per registrarti come Mentore o Mentee</CardDescription>
           </CardHeader>
           <CardContent>
+          {feedbackMessage && (
+  <div
+    className={`flex items-center gap-4 p-4 mb-4 text-sm rounded-lg shadow-md transition-transform transform ${
+      feedbackType === "success"
+        ? "bg-green-50 text-green-800 border border-green-300"
+        : "bg-red-50 text-red-800 border border-red-300"
+    }`}
+    role="alert"
+  >
+    <span
+      className={`flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full ${
+        feedbackType === "success" ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"
+      }`}
+    >
+      {feedbackType === "success" ? (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+      ) : (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M18.364 5.636l-1.414 1.414M5.636 18.364l-1.414-1.414M12 3v18m9-9H3"
+          />
+        </svg>
+      )}
+    </span>
+    <span className="flex-grow">{feedbackMessage}</span>
+    <button
+      type="button"
+      onClick={() => setFeedbackMessage(null)}
+      className="text-sm font-medium text-gray-500 hover:text-gray-700"
+    >
+      ✕
+    </button>
+  </div>
+)}
+
             <form onSubmit={handleSubmit} noValidate>
               {step === 1 && (
                 <div className="space-y-4">
