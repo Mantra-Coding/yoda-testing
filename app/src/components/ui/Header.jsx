@@ -21,15 +21,16 @@ export default function Header() {
     setIsMenuOpen((prev) => !prev);
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      setUser(null);
-      navigate('/login'); // Reindirizza alla pagina di login
-    } catch (error) {
-      console.error('Errore durante il logout:', error);
-    }
-  };
+const handleLogout = async () => {
+  try {
+    await signOut(auth);
+    setUser(null);
+    navigate('/login', { state: { message: 'Logout effettuato con successo' } }); // Passa il messaggio
+  } catch (error) {
+    console.error('Errore durante il logout:', error);
+  }
+};
+
 
   return (
     <header className="bg-white border-b border-green-200 px-6 py-3">
