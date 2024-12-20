@@ -5,6 +5,8 @@ import Home from './components/pages/Homepage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LoginPage from './components/pages/LoginPage';
 import { MentorSearchForm } from './components/pages/mentor-search-form';
+import FileHomePage from './components/pages/FileHomePage';
+import FileAddDocument from './components/pages/fileAddDocument';
 
 
 function App() {
@@ -17,6 +19,8 @@ function App() {
         <Route path="/register" element={<RegistrationPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/mentorsearch" element={<MentorSearchForm />} />
+        <Route path="/filepage" element={<FileHomePage />} />
+        <Route path="/addfile" element={<FileAddDocument />} />
       </Routes>
     </BrowserRouter>
   );
