@@ -26,14 +26,14 @@ export function useMentorSearch() {
     setError("");
 
     try {
-      const mentorsRef = collection(db, "mentors");
+      const mentorsRef = collection(db, "utenti"); // Cambia "mentors" a "utenti"
       let q = query(mentorsRef);
 
-      // Applica i filtri dinamicamente
-      if (field) q = query(q, where("field", "==", field));
-      if (occupation) q = query(q, where("occupation", "==", occupation));
-      if (availability) q = query(q, where("availability", ">=", availability));
-      if (meetingMode) q = query(q, where("meetingMode", "==", meetingMode));
+      // Applica i filtri dinamicamente sulla base dei criteri di ricerca
+      if (field) q = query(q, where("field", "==", field)); // Usa il campo "field" nel database
+      if (occupation) q = query(q, where("occupazione", "==", occupation)); // Usa "occupazione" invece di "occupation"
+      if (availability) q = query(q, where("availability", ">=", availability)); // Usa "availability"
+      if (meetingMode) q = query(q, where("meetingMode", "==", meetingMode)); // Usa "meetingMode"
 
       // Esegui la query su Firestore
       const querySnapshot = await getDocs(q);
@@ -42,6 +42,10 @@ export function useMentorSearch() {
         ...doc.data(),
       }));
 
+      if (mentorList.length === 0) {
+        setError("Nessun mentore trovato con i criteri specificati.");
+      }
+      
       // Aggiorna lo stato con i risultati
       setMentors(mentorList);
     } catch (err) {
@@ -51,7 +55,6 @@ export function useMentorSearch() {
       setLoading(false);
     }
   };
-
   return {
     mentors, // Lista dei mentori trovati
     loading, // Stato di caricamento
