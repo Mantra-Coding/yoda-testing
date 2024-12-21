@@ -11,6 +11,10 @@ import HomePageMentee from './components/pages/HomePageMentee'
 import HomePageMentore from './components/pages/HomePageMentore'
 
 
+import MentorProfileForm from './components/pages/ModifyProfile';
+import DettagliUtenteWrapper from './components/pages/DettaglioUtente';
+
+
 function App() {
   const db = app;
   console.log(db);
@@ -20,13 +24,13 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<RegistrationPage/>}/>
         <Route path="/login" element={<LoginPage/>}/>
-        <Route path="/profile" element={<ModifyProfile/>}/>
+        <Route path="/profile" element={<MentorProfileForm/>}/>
         <Route path="/mentorsearch" element={<MentorSearchForm />} />
         <Route path="/filepage" element={<FileHomePage />} />
         <Route path="/addfile" element={<FileAddDocument />} />
         <Route path="/HomePageMentee" element={<HomePageMentee />} />
         <Route path="/HomePageMentore" element={<HomePageMentore />} />
-        
+        <Route path="/dettagli/:userId" element={<DettagliUtenteWrapper/>} />
       </Routes>
     </BrowserRouter>
   );
