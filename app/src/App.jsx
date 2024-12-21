@@ -6,6 +6,9 @@ import LoginPage from './components/pages/LoginPage';
 import { MentorSearchForm } from './components/pages/mentor-search-form';
 import FileHomePage from './components/pages/FileHomePage';
 import FileAddDocument from './components/pages/fileAddDocument';
+import ModifyProfile from './components/pages/ModifyProfile';
+import HomePageMentee from './components/pages/HomePageMentee'
+import HomePageMentore from './components/pages/HomePageMentore'
 
 
 function App() {
@@ -21,6 +24,9 @@ function App() {
         <Route path="/mentorsearch" element={<MentorSearchForm />} />
         <Route path="/filepage" element={<FileHomePage />} />
         <Route path="/addfile" element={<FileAddDocument />} />
+        <Route path="/HomePageMentee" element={<HomePageMentee />} />
+        <Route path="/HomePageMentore" element={<HomePageMentore />} />
+        
       </Routes>
     </BrowserRouter>
   );
