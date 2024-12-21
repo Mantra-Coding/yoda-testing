@@ -26,7 +26,7 @@ function App() {
         <Route path="/login" element={<LoginPage/>}/>
         <Route path="/profile" element={<MentorProfileForm/>}/>
         <Route path="/mentorsearch" element={<MentorSearchForm />} />
-        <Route path="/filepage" element={<FileHomePage />} />
+        <Route path="/contents" element={<FileHomePage />} />
         <Route path="/addfile" element={<FileAddDocument />} />
         <Route path="/HomePageMentee" element={<HomePageMentee />} />
         <Route path="/HomePageMentore" element={<HomePageMentore />} />
