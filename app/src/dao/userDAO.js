@@ -1,10 +1,31 @@
 // Importa i metodi necessari da Firebase Firestore
-import { getFirestore, getDoc, doc} from "firebase/firestore";
-
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, getDoc, doc } from "firebase/firestore";
 // Inizializza Firestore
 const db = getFirestore();
+const auth = getAuth();
 
 //DAO per l'utente e le varie funzionalità
+
+
+
+/**
+ * Ottiene l'UID dell'utente attualmente autenticato.
+ * @returns {Promise<string>} - Restituisce l'UID dell'utente.
+ * @throws {Error} - Solleva un errore se l'utente non è autenticato.
+ */
+export async function getCurrentUserUID() {
+  return new Promise((resolve, reject) => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        resolve(user.uid); // Restituisce l'UID se l'utente è autenticato
+      } else {
+        reject(new Error("Nessun utente autenticato."));
+      }
+    });
+  });
+}
+
 
 /**
  * Recupera i dati di un utente dato il suo ID.
