@@ -9,7 +9,9 @@ import FileAddDocument from './components/pages/fileAddDocument';
 import ModifyProfile from './components/pages/ModifyProfile';
 import HomePageMentee from './components/pages/HomePageMentee'
 import HomePageMentore from './components/pages/HomePageMentore'
-
+import InserireVideo from './components/pages/InserireVideo';
+import Video from './components/pages/Video';  // Componente per la lista dei video
+import DettaglioVideo from './components/pages/DettaglioVideo';
 
 import MentorProfileForm from './components/pages/ModifyProfile';
 import DettagliUtenteWrapper from './components/pages/DettaglioUtente';
@@ -31,6 +33,9 @@ function App() {
         <Route path="/HomePageMentee" element={<HomePageMentee />} />
         <Route path="/HomePageMentore" element={<HomePageMentore />} />
         <Route path="/dettagli/:userId" element={<DettagliUtenteWrapper/>} />
+        <Route path="/InserireVideo" element={<InserireVideo />} />
+        <Route path="/videos" element={<Video />} />
+        <Route path="/video/:id" element={<DettaglioVideo />} />
       </Routes>
     </BrowserRouter>
   );
