@@ -48,8 +48,6 @@ export default function Video() {
               <Link key={video.id} to={`/video/${video.id}`}>
                 <VideoCard
                   title={video.title}
-                  author={video.author}
-                  role={video.role}
                   thumbnail={
                     (video.videoUrl && video.videoUrl.startsWith("http")) || video.thumbnail
                       ? video.thumbnail // Mostra la miniatura se disponibile
