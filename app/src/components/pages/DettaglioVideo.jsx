@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../ui/Header";
 import { collection, doc, getDoc, getFirestore } from "firebase/firestore"; 
+import { getStorage, ref, getDownloadURL, connectStorageEmulator } from "firebase/storage"; 
 import app from '@/Firebase/firebase';
 
 export default function DettaglioVideo() {
@@ -9,8 +10,14 @@ export default function DettaglioVideo() {
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
-  // Function to check if a URL is valid
+  // Configura l'emulatore per Firebase Storage
+  if (window.location.hostname === 'localhost') {
+    connectStorageEmulator(storage, 'localhost', 9199); // Porta dell'emulatore di Firebase Storage
+  }
+
+  // Funzione per verificare se l'URL è valido
   function isValidURL(url) {
     try {
       new URL(url);  // Prova a creare un URL per vedere se è valido
@@ -27,7 +34,15 @@ export default function DettaglioVideo() {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          setVideo({ id: docSnap.id, ...docSnap.data() });
+          const videoData = { id: docSnap.id, ...docSnap.data() };
+          setVideo(videoData);
+
+          // Se il video è stato caricato come file (e non come URL), ottieni l'URL dal Firebase Storage
+          if (videoData.videoFile) {
+            const videoRef = ref(storage, `videos/${videoData.videoFile.name}`); // Nome del file video
+            const videoUrl = await getDownloadURL(videoRef);
+            setVideo((prevVideo) => ({ ...prevVideo, videoUrl })); // Aggiungi l'URL del video al videoData
+          }
         } else {
           console.error("Video non trovato");
         }
@@ -67,9 +82,6 @@ export default function DettaglioVideo() {
             <h2 className="text-3xl font-semibold text-[#178563] mb-2">
               {video.title}
             </h2>
-            <div className="text-gray-700 text-lg">
-              <p>{video.author}</p>
-            </div>
           </div>
 
           <div className="relative aspect-video bg-gray-100 rounded-md overflow-hidden mb-6">
@@ -86,12 +98,13 @@ export default function DettaglioVideo() {
               ></iframe>
             ) : hasValidFile ? (
               // Se il video è stato caricato come file
-              <video
-                controls
-                className="object-cover w-full h-full"
-                src={video.videoFile} // Video file caricato
-                alt={video.title}
-              />
+              <video controls className="object-cover w-full h-full">
+                <source
+                  src={video.videoUrl} // Video file caricato
+                  type="video/mp4"
+                  alt={video.title}
+                />
+              </video>
             ) : (
               // Se nessuno dei due è valido, mostra un'immagine di fallback
               <img

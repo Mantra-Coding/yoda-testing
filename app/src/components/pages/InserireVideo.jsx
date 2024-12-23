@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../ui/Header';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Upload } from 'lucide-react';
 import { collection, addDoc, getFirestore } from "firebase/firestore";
-import app from '@/Firebase/firebase';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import app, { storage } from '@/Firebase/firebase'; // Assicurati che storage venga importato
+import { getAuth } from 'firebase/auth'; // Importazione per l'autenticazione
 
 export default function InserireVideo() {
   const [title, setTitle] = useState('');
@@ -19,6 +21,7 @@ export default function InserireVideo() {
   const [descriptionError, setDescriptionError] = useState('');
   const [videoError, setVideoError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(true); // Stato per verificare se l'utente è autorizzato
   const navigate = useNavigate();
   const db = getFirestore(app);
 
@@ -26,6 +29,31 @@ export default function InserireVideo() {
   const removeFile = () => {
     setVideoFile(null);
   };
+
+  useEffect(() => {
+    // Controllo autenticazione e ruolo
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      setIsAuthorized(false); // Se l'utente non è loggato
+      return;
+    }
+
+    // Controlla il ruolo dell'utente nel Firestore (esempio con campo "role")
+    const userRef = collection(db, "users"); // Supponiamo che gli utenti siano nella collezione "users"
+    const userDoc = userRef.doc(user.uid);
+    userDoc.get().then((docSnapshot) => {
+      if (docSnapshot.exists) {
+        const userData = docSnapshot.data();
+        if (userData.role !== 'admin') {
+          setIsAuthorized(false); // Se non è un admin, accesso negato
+        }
+      } else {
+        setIsAuthorized(false); // Se l'utente non esiste nel database
+      }
+    });
+  }, [db]);
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -35,7 +63,6 @@ export default function InserireVideo() {
     setDescriptionError('');
     setUploadSuccess(false);
 
-    // Verifica che titolo e descrizione siano compilati
     if (!title) {
       setTitleError('Il titolo è obbligatorio!');
       setUploading(false);
@@ -48,26 +75,36 @@ export default function InserireVideo() {
       return;
     }
 
-    // Verifica che almeno uno tra URL e video file sia compilato
     if (!videoUrl && !videoFile) {
       setVideoError('Devi compilare almeno uno dei due campi: URL o file video!');
       setUploading(false);
       return;
     }
+    if (videoUrl && videoFile) {
+      setVideoError('Riempi solo 1 campo: URL o file video!');
+      setUploading(false);
+      return;
+    }
 
     try {
+      let uploadedVideoUrl = videoUrl;
+
+      if (videoFile) {
+        const storageRef = ref(storage, `videos/${videoFile.name}`);
+        await uploadBytes(storageRef, videoFile);
+        uploadedVideoUrl = await getDownloadURL(storageRef);
+      }
+
       const videoData = {
         title,
         description,
-        thumbnail: "default-thumbnail-url", 
-        videoUrl: videoUrl || "default-video-url", 
-        author: "Admin",
-        role: "Uploader",
+        thumbnail: "default-thumbnail-url",
+        videoUrl: uploadedVideoUrl,
       };
 
       await addDoc(collection(db, "videos"), videoData);
       setUploadSuccess(true);
-      setTimeout(() => navigate('/videos'), 3000); // Redirige dopo 3 secondi
+      setTimeout(() => navigate('/videos'), 3000);
 
     } catch (error) {
       console.error("Errore durante il caricamento del video:", error);
@@ -75,6 +112,18 @@ export default function InserireVideo() {
     } finally {
       setUploading(false);
     }
+  }
+
+  // Se l'utente non è autorizzato, mostra il messaggio di accesso negato
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="bg-white p-6 rounded-lg shadow-md text-center">
+          <h2 className="text-2xl font-semibold text-red-600">Accesso Negato</h2>
+          <p className="text-lg text-gray-700">Non hai i permessi per accedere a questa pagina.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -117,7 +166,6 @@ export default function InserireVideo() {
                   {descriptionError && <p className="text-red-600 text-lg font-semibold">{descriptionError}</p>}
                 </div>
 
-                {/* Campo per inserire un link del video */}
                 <div className="space-y-1">
                   <Label htmlFor="videoUrl" className="text-[#178563]">Link del video (YouTube, Vimeo, ecc.)</Label>
                   <Input
@@ -129,10 +177,8 @@ export default function InserireVideo() {
                   />
                 </div>
 
-                {/* Campo per caricare un file video */}
                 <div className="space-y-1">
                   <Label htmlFor="video" className="text-[#178563]">File video</Label>
-                  {/* Visualizzazione del nome del file caricato */}
                   {videoFile && (
                     <div className="flex justify-between items-center">
                       <span className="text-[#178563] font-semibold">{videoFile.name}</span>
@@ -182,11 +228,10 @@ export default function InserireVideo() {
               </Button>
             </form>
 
-            {/* Messaggio di successo */}
             {uploadSuccess && <p className="text-green-600 text-lg font-semibold mt-4">Il video è stato caricato con successo!</p>}
           </div>
         </main>
       </div>
     </div>
   );
-} 
+}
