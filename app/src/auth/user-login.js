@@ -10,7 +10,7 @@ async function loginUser(email, password) {
     // Effettua il login con email e password
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-    console.log("Login effettuato con successo!", user.uid);
+    console.log("Login effettuato con successo!", userCredential.uid);
     return { success: true, userId: userCredential.uid, email: userCredential.email };
   } catch (error) {
     console.error("Errore durante il login:", error.message);
