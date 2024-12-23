@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
   const [userType, setUserType] = useState(null);
   const [isLogged, setIsLogged] = useState(false);
+  const [nome, setNome] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,12 +31,14 @@ export const AuthProvider = ({ children }) => {
           setUserId(user.uid);
           setUserType(userData.userType);
           setIsLogged(true);
+          setNome(userData.nome);
 
           // Persisti i dati nel localStorage
           localStorage.setItem(
             "auth",
             JSON.stringify({
               userId: user.uid,
+              name: user.nome,
               userType: userData.userType,
               isLogged: true,
             })
@@ -46,6 +49,7 @@ export const AuthProvider = ({ children }) => {
         setUserId(null);
         setUserType(null);
         setIsLogged(false);
+        setNome(null);
         localStorage.removeItem("auth");
       }
       setLoading(false);
@@ -54,11 +58,12 @@ export const AuthProvider = ({ children }) => {
     // Carica i dati dal localStorage all'avvio
     const storedAuth = localStorage.getItem("auth");
     if (storedAuth) {
-      const { userId, userType, isLogged } = JSON.parse(storedAuth);
+      const { userId, userType, isLogged, nome } = JSON.parse(storedAuth);
       setUserId(userId);
       setUserType(userType);
       setIsLogged(isLogged);
       setLoading(false);
+      setNome(nome);
     }
 
     return () => unsubscribe();
@@ -70,6 +75,7 @@ export const AuthProvider = ({ children }) => {
       setUserId(null);
       setUserType(null);
       setIsLogged(false);
+      setNome(null);
       localStorage.removeItem("auth");
     });
   };
@@ -79,6 +85,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         userId,
         userType,
+        nome,
         isLogged,
         logout,
       }}

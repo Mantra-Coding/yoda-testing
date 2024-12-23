@@ -3,18 +3,19 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/ui/Header";
+import { useAuth } from "@/auth/auth-context";
 
 export default function HomePageUtente() {
-  const location = useLocation();
-  const { userName, userType } = location.state || {}; // Estrai userName e userType dallo stato
+  const {userType, nome} = useAuth();
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (userName && userType) {
+    console.log("Valori iniziali:", { userType, nome });
+    if (nome && userType) {
       setLoading(false);
     }
-  }, [userName, userType]);
+  }, [nome, userType]);
 
   if (loading) {
     return (
@@ -30,7 +31,7 @@ export default function HomePageUtente() {
 
       <main className="max-w-6xl mx-auto px-4 py-16 text-center">
         <h1 className="text-4xl font-bold text-white mb-4">
-          Benvenuto {userName}
+          Benvenuto {nome}
         </h1>
         <p className="text-lg text-white/80 mb-8">
           Connettiti con mentori senior del settore IT e accelera la tua carriera
