@@ -7,11 +7,10 @@ import { MentorSearchForm } from './components/pages/mentor-search-form';
 import FileHomePage from './components/pages/FileHomePage';
 import FileAddDocument from './components/pages/fileAddDocument';
 import ModifyProfile from './components/pages/ModifyProfile';
-import HomePageMentee from './components/pages/HomePageMentee'
-import HomePageMentore from './components/pages/HomePageMentore'
 import InserireVideo from './components/pages/InserireVideo';
 import Video from './components/pages/Video';  // Componente per la lista dei video
 import DettaglioVideo from './components/pages/DettaglioVideo';
+import HomePageUtente from './components/pages/HomePageUtente'
 
 import MentorProfileForm from './components/pages/ModifyProfile';
 import DettagliUtenteWrapper from './components/pages/DettaglioUtente';
@@ -30,8 +29,7 @@ function App() {
         <Route path="/mentorsearch" element={<MentorSearchForm />} />
         <Route path="/contents" element={<FileHomePage />} />
         <Route path="/addfile" element={<FileAddDocument />} />
-        <Route path="/HomePageMentee" element={<HomePageMentee />} />
-        <Route path="/HomePageMentore" element={<HomePageMentore />} />
+        <Route path="/HomePageUtente" element={<HomePageUtente />} />
         <Route path="/dettagli/:userId" element={<DettagliUtenteWrapper/>} />
         <Route path="/InserireVideo" element={<InserireVideo />} />
         <Route path="/videos" element={<Video />} />

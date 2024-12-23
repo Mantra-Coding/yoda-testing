@@ -61,16 +61,11 @@ export default function LoginPage() {
             console.log("Tipo di utente:", userType);
   
             // Naviga in base al tipo di utente
-            if (userType === "mentee") {
-              console.log("Tipo di utente: mentee. Navigo verso '/HomePageMentee'");
-              navigate("/HomePageMentee", { state: { userName, userType } });
-            } else if (userType === "mentor") {
-              console.log("Tipo di utente: mentor. Navigo verso '/HomePageMentore'");
-              navigate("/HomePageMentore", { state: { userName, userType } });
-            } else {
+            // Naviga verso HomePageUtente con i dati utente
+              navigate("/HomePageUtente", { state: { userName, userType } })
               console.error("Tipo di utente non riconosciuto:", userType);
               setError("Tipo di utente non riconosciuto.");
-            }
+            
           } else {
             console.error("Errore: nome o userType assenti nei dati utente.", userData);
             setError("I dati utente non sono completi.");
