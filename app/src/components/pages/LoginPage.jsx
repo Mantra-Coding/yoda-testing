@@ -35,7 +35,8 @@ export default function LoginPage() {
       // Chiamata alla funzione di login
       const result = await loginUser(email, password);
       console.log("Risultato login:", result);
-  
+      
+      
       if (result.success) {
         console.log("Utente autenticato con successo. ID utente:", result.userId);
   
