@@ -32,7 +32,8 @@ export default function LoginPage() {
       // Chiamata alla funzione di login
       const result = await loginUser(email, password);
       console.log("Risultato login:", result);
-  
+      
+      
       if (result.success) {
             // Naviga in base al tipo di utente
             // Naviga verso HomePageUtente con i dati utente

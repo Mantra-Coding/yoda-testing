@@ -21,7 +21,6 @@ export default function VideoDettaglio({ title, author, role, initials }) {
         <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-sm">
           {initials}
         </div>
-        <span className="font-medium">{author}</span>
       </div>
     </div>
   );

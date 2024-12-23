@@ -14,11 +14,6 @@ export default function VideoCard({ title, author, role }) {
       </div>
       <div className="p-4 mt-4">
         <h3 className="font-medium text-white mb-2 text-xl">{title}</h3> {/* Titolo rimpicciolito */}
-        <div className="flex items-center text-sm text-white">
-          <span className="text-base">{author}</span> {/* Autore leggermente più grande */}
-          <span className="mx-2">•</span>
-          <span className="text-base">{role}</span> {/* Ruolo leggermente più grande */}
-        </div>
       </div>
     </div>
   );
