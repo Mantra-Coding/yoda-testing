@@ -10,14 +10,17 @@ async function registerUser(formData, portfolioProjects) {
     const auth = getAuth(app);
 
     // Registra l'utente con email e password
-    const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      formData.email,
+      formData.password
+    );
 
     // Ottieni l'UID dell'utente creato
     const userId = userCredential.user.uid;
 
     // Ottieni l'istanza di Firestore
     const db = getFirestore(app);
-
 
     // Crea un documento utente in Firestore
     const userData = {
@@ -28,17 +31,23 @@ async function registerUser(formData, portfolioProjects) {
       dataNascita: formData.dataDiNascita,
       titoloDiStudio: formData.titoloDiStudio,
       competenze: formData.competenze,
-      occupazione: formData.occupazione, // Ora accetta valori aggiornati come "developer", "web-developer", ecc.
+      occupazione: formData.occupazione, // Aggiornato per accettare valori specifici come "developer", "web-developer", ecc.
       userType: formData.userType,
       portfolioProjects: portfolioProjects || [],
       cv: formData.cv ? formData.cv.name : null, // Salva il nome del file CV
       createdAt: new Date().toISOString(), // Aggiunto per tracciare la data di registrazione
+      field: formData.field || "", // Aggiunto per gestire il campo di interesse sia per mentor che mentee
     };
 
+    // Aggiungi proprietà specifiche per i mentor
     if (formData.userType === "mentor") {
-      userData.availability = formData.availability || 0; // Salva la disponibilità
+      userData.availability = formData.availability || 0; // Disponibilità settimanale
+      userData.meetingMode = formData.meetingMode || "online"; // Modalità di incontro
     }
-    
+
+    if (formData.userType === "mentee") {
+      userData.field = formData.field || ""; // Campo di interesse del mentee
+    }
 
     // Scrivi i dati utente su Firestore
     await setDoc(doc(db, "utenti", userId), userData);
