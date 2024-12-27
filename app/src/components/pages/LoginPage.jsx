@@ -37,7 +37,8 @@ export default function LoginPage() {
       if (result.success) {
             // Naviga in base al tipo di utente
             // Naviga verso HomePageUtente con i dati utente
-              navigate("/HomePageUtente")       
+            console.log("Login effettuato con successo, navigo a /HomePageUtente");
+            window.location.href = "/HomePageUtente";
           } 
       else {
             setError(result.error);
