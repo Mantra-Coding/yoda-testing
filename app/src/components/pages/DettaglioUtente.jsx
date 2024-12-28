@@ -3,7 +3,7 @@ import Header from '../ui/Header';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from '@/components/ui/badge';
-import { Mail, Phone, MapPin, Briefcase, GraduationCap, Users, Cake, ArrowRight, Download } from 'lucide-react';
+import { Mail, Phone, MapPin, Briefcase, GraduationCap, Users, Cake, ArrowRight, Download, Clock } from 'lucide-react';
 import { getUserByID } from '@/dao/userDAO';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -37,7 +37,7 @@ function DettagliUtente({ user }) {
           {/* Corpo della card */}
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Dettagli di contatto */}
+              {/* Dettagli personali */}
               <div className="space-y-2">
                 {user.email && (
                   <div className="flex items-center space-x-2">
@@ -45,41 +45,68 @@ function DettagliUtente({ user }) {
                     <span>{user.email}</span>
                   </div>
                 )}
-                {user.contact?.telefono && (
+                {user.dataNascita && (
                   <div className="flex items-center space-x-2">
-                    <Phone className="text-[#178563]" />
-                    <span>{user.contact.telefono || "Non disponibile"}</span>
+                    <Cake className="text-[#178563]" />
+                    <span>Data di nascita: {user.dataNascita}</span>
                   </div>
                 )}
-              </div>
-
-              {/* Altri dettagli */}
-              <div className="space-y-2">
+                {user.sesso && (
+                  <div className="flex items-center space-x-2">
+                    <Users className="text-[#178563]" />
+                    <span>Genere: {user.sesso}</span>
+                  </div>
+                )}
                 {user.titoloDiStudio && (
                   <div className="flex items-center space-x-2">
                     <GraduationCap className="text-[#178563]" />
                     <span>{user.titoloDiStudio}</span>
                   </div>
                 )}
-                {user.dataNascita && (
-                  <div className="flex items-center space-x-2">
-                    <Cake className="text-[#178563]" />
-                    <span>Nato il: {user.dataNascita}</span>
-                  </div>
+              </div>
+
+              {/* Sezione specifica per Mentor o Mentee */}
+              <div className="space-y-2">
+                {isMentor ? (
+                  <>
+                    {user.field && (
+                      <div className="flex items-center space-x-2">
+                        <Briefcase className="text-[#178563]" />
+                        <span>Settore IT: {user.field}</span>
+                      </div>
+                    )}
+                    {user.availability && (
+                      <div className="flex items-center space-x-2">
+                        <Clock className="text-[#178563]" />
+                        <span>Disponibilità: {user.availability} ore settimanali</span>
+                      </div>
+                    )}
+                    {user.meetingMode && (
+                      <div className="flex items-center space-x-2">
+                        <MapPin className="text-[#178563]" />
+                        <span>Modalità di incontro: {user.meetingMode}</span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {user.field && (
+                      <div className="flex items-center space-x-2">
+                        <ArrowRight className="text-[#178563]" />
+                        <span>Interesse: {user.field}</span>
+                      </div>
+                    )}
+                  </>
                 )}
-                <div className="flex items-center space-x-2">
-                  <Briefcase className="text-[#178563]" />
-                  <span>Ore disponibili: {user.avaibility || 0} ore settimanali</span>
-                </div>
               </div>
             </div>
 
             {/* Sezione competenze */}
             {user.competenze && (
               <div className="mt-6">
-                <h3 className="text-xl font-semibold mb-2">In cosa sono esperto?</h3>
+                <h3 className="text-xl font-semibold mb-2">Competenze</h3>
                 <div className="flex flex-wrap gap-2">
-                  {user.competenze.split("\n").map((skill, index) => ( //nell'implementazione, viene inserito un testo in cui ogni riga rappresenta una competenza
+                  {user.competenze.split("\n").map((skill, index) => (
                     <Badge key={index} variant="secondary">
                       {skill}
                     </Badge>
@@ -88,32 +115,36 @@ function DettagliUtente({ user }) {
               </div>
             )}
 
-              {/* Sezione Portfolio */}
-              {user.portfolioProjects && user.portfolioProjects.length > 0 && (
-                <div className="mt-6">
-                  <h3 className="text-xl font-semibold mb-2">Portfolio</h3>
-                  <div className="space-y-4">
-                    {user.portfolioProjects.map((project, index) => (
-                      <Link
-                        key={project.id || index} // Usa una chiave univoca
-                        to={`/portfolio/${project.id}`} // Usa un ID o l'indice per la navigazione
-                        className="block bg-[#f9f9f9] p-4 rounded-lg hover:bg-[#f1f1f1] shadow-md transition-all"
-                      >
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <h4 className="text-lg font-medium text-[#178563]">{project.name}</h4>
-                            <p className="text-sm text-gray-600">{project.description.slice(0, 50)}...</p>
-                          </div>
-                          <ArrowRight className="text-[#178563]" />
+            {/* Sezione Portfolio */}
+            {user.portfolioProjects && user.portfolioProjects.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-xl font-semibold mb-2">Portfolio</h3>
+                <div className="space-y-4">
+                  {user.portfolioProjects.map((project, index) => (
+                    <Link
+                      key={index}
+                      to={`/portfolio/${project.id}`}
+                      className="block bg-[#f9f9f9] p-4 rounded-lg hover:bg-[#f1f1f1] shadow-md transition-all"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h4 className="text-lg font-medium text-[#178563]">
+                            {project.name || "Progetto senza nome"}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {project.description?.slice(0, 50) || "Descrizione non disponibile"}...
+                          </p>
                         </div>
-                      </Link>
-                    ))}
-                  </div>
+                        <ArrowRight className="text-[#178563]" />
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-              )}
-              
-              {/* Sezione Curriculum */}
-              {user.cv && (
+              </div>
+            )}
+
+            {/* Sezione Curriculum */}
+            {user.cv && (
               <div className="mt-6">
                 <h3 className="text-xl font-semibold mb-2">Curriculum</h3>
                 <div className="flex items-center space-x-2">
@@ -123,7 +154,7 @@ function DettagliUtente({ user }) {
                     download
                     className="text-[#178563] underline hover:text-[#13674c] transition-all"
                   >
-                    Scarica il mio Curriculum
+                    Scarica il Curriculum
                   </a>
                 </div>
               </div>
@@ -132,7 +163,7 @@ function DettagliUtente({ user }) {
             {/* Azione finale */}
             <div className="mt-6 flex justify-end">
               <Button className="bg-[#178563] text-white hover:bg-[#178563]/90">
-                {isMentor ? "Richiedi Mentorship" : "Contatta il Mentore"}
+                {isMentor ? "Richiedi Mentorship" : "Contatta il Mentee"}
               </Button>
             </div>
           </CardContent>
@@ -142,7 +173,8 @@ function DettagliUtente({ user }) {
   );
 }
 
-export default function DettagliUtenteWrapper() {
+
+function DettagliUtenteWrapper() {
   const { userId } = useParams(); // Ottiene l'ID dell'utente dai parametri dell'URL
   const [user, setUser] = useState(null); // Stato per i dati dell'utente
   const [loading, setLoading] = useState(true); // Stato per il caricamento
@@ -177,3 +209,6 @@ export default function DettagliUtenteWrapper() {
 
   return <DettagliUtente user={user} />;
 }
+
+
+export { DettagliUtente, DettagliUtenteWrapper};
