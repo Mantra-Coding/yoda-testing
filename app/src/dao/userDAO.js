@@ -43,7 +43,7 @@ export async function getUserByID(userId) {
 
     // Controlla se il documento esiste
     if (utente.exists()) {
-      return utente.data(); // Restituisce i dati come oggetto
+      return { id: userId, ...utente.data() }; // Aggiunge l'ID all'oggetto dati
     } else {
       throw new Error("Utente non trovato!");
     }

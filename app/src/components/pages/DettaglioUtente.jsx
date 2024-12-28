@@ -7,10 +7,18 @@ import { Mail, Phone, MapPin, Briefcase, GraduationCap, Users, Cake, ArrowRight,
 import { getUserByID } from '@/dao/userDAO';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/auth/auth-context';
 
 function DettagliUtente({ user }) {
   const isMentor = user.userType === "mentor";
-
+  const {userId} = useAuth();
+  const ownPage = userId === user.id;
+  function handleClick() {
+    if (ownPage) {
+      window.location.href="/edit-profile";return;}
+    if (isMentor) console.log ("[DettaglioUtente] Richiedi mentorship");
+    else console.log("[DettaglioUtente] RichiedoContatto")
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#178563] to-white text-black">
       <Header />
@@ -162,8 +170,12 @@ function DettagliUtente({ user }) {
 
             {/* Azione finale */}
             <div className="mt-6 flex justify-end">
-              <Button className="bg-[#178563] text-white hover:bg-[#178563]/90">
-                {isMentor ? "Richiedi Mentorship" : "Contatta il Mentee"}
+              <Button className="bg-[#178563] text-white hover:bg-[#178563]/90" onClick={()=>handleClick()}>
+                {ownPage 
+                  ? "Modifica Profilo" 
+                  : isMentor 
+                    ? "Richiedi Mentorship" 
+                    : "Contatta il Mentee"}
               </Button>
             </div>
           </CardContent>
