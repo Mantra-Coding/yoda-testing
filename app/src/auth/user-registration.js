@@ -1,10 +1,29 @@
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
-
+import { storage } from "@/firebase/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import app from "@/firebase/firebase";
 
+// Funzione per caricare il CV su Firebase Storage
+export async function uploadCV(file, userID) {
+  try {
+    const cvRef = ref(storage, `utenti/${userID}/cv/${file.name}`);
+
+    // Carica il file nel percorso definito
+    await uploadBytes(cvRef, file);
+    
+    // Ottieni l'URL del file caricato
+    const cvURL = await getDownloadURL(cvRef);
+    
+    return cvURL; // Restituisce l'URL del file caricato
+  } catch (error) {
+    console.error("Errore durante il caricamento del CV:", error.message);
+    throw new Error("Errore durante il caricamento del CV.");
+  }
+}
+
 // Funzione di registrazione
-async function registerUser(formData, portfolioProjects) {
+export async function registerUser(formData, portfolioProjects) {
   try {
     // Ottieni l'istanza di Firebase Auth
     const auth = getAuth(app);
@@ -22,6 +41,12 @@ async function registerUser(formData, portfolioProjects) {
     // Ottieni l'istanza di Firestore
     const db = getFirestore(app);
 
+        // Carica il file CV se presente
+    let cvURL = null;
+    if (formData.cv) {
+      cvURL = await uploadCV(formData.cv, userId); // Carica il CV e ottieni l'URL
+    }
+
     // Crea un documento utente in Firestore
     const userData = {
       nome: formData.nome,
@@ -34,7 +59,7 @@ async function registerUser(formData, portfolioProjects) {
       occupazione: formData.occupazione, // Aggiornato per accettare valori specifici come "developer", "web-developer", ecc.
       userType: formData.userType,
       portfolioProjects: portfolioProjects || [],
-      cv: formData.cv ? formData.cv.name : null, // Salva il nome del file CV
+      cv: cvURL, // Salva il nome del file CV
       createdAt: new Date().toISOString(), // Aggiunto per tracciare la data di registrazione
       field: formData.field || "", // Aggiunto per gestire il campo di interesse sia per mentor che mentee
     };
@@ -64,5 +89,3 @@ async function registerUser(formData, portfolioProjects) {
     }
   }
 }
-
-export { registerUser };

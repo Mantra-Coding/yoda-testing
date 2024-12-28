@@ -23,19 +23,23 @@ function App() {
     <AuthProvider>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} /> 
-        <Route path="/register" element={<RegistrationPage/>}/>
-        <Route path="/login" element={<LoginPage/>}/>
-        <Route element={<PrivateRoutes/>}>
+        <Route path="/login" element={<LoginPage/>}/> 
+        <Route element={<PrivateRoutes roles={[]}/>}>
+            <Route path="/" element={<Home />} /> 
+            <Route path="/register" element={<RegistrationPage/>}/>
+        </Route>
+        <Route element={<PrivateRoutes roles={["mentor","mentee"]}/>}>
           <Route path="/dettagli/:userId" element={<DettagliUtenteWrapper/>} />
           <Route path="/HomePageUtente" element={<HomePageUtente />} />
           <Route path="/profile" element={<MentorProfileForm/>}/>
           <Route path="/mentorsearch" element={<MentorSearchForm />} />
           <Route path="/contents" element={<FileHomePage />} />
-          <Route path="/addfile" element={<FileAddDocument />} />
-          <Route path="/InserireVideo" element={<InserireVideo />} />
           <Route path="/videos" element={<Video />} />
           <Route path="/video/:id" element={<DettaglioVideo />} />
+        </Route>
+        <Route element={<PrivateRoutes roles={["mentor"]}/>}>
+          <Route path="/addfile" element={<FileAddDocument />} />
+          <Route path="/InserireVideo" element={<InserireVideo />} />
         </Route>
        </Routes>
       </BrowserRouter>
