@@ -1,7 +1,7 @@
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { storage } from "@/firebase/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import app from "@/firebase/firebase";
 
 // Funzione per caricare il CV su Firebase Storage
@@ -21,6 +21,34 @@ export async function uploadCV(file, userID) {
     throw new Error("Errore durante il caricamento del CV.");
   }
 }
+
+
+// Funzione per caricare o aggiornare il CV
+
+export async function updateCV(file, userId, oldCvURL = null) {
+  try {
+    const cvRef = ref(storage, `utenti/${userId}/cv/${file.name}`);
+
+    // Se c'è un vecchio CV, rimuoviamolo prima di caricare il nuovo
+    if (oldCvURL) {
+      const oldCvRef = ref(storage, oldCvURL);
+      await deleteObject(oldCvRef);
+    }
+
+    // Carica il nuovo CV nel percorso definito
+    await uploadBytes(cvRef, file);
+
+    // Ottieni l'URL del nuovo file caricato
+    const cvURL = await getDownloadURL(cvRef);
+
+    console.log("CV aggiornato con successo!");
+    return cvURL; // Restituisce l'URL del nuovo CV
+  } catch (error) {
+    console.error("Errore durante il caricamento del CV:", error.message);
+    throw new Error("Errore durante il caricamento del CV.");
+  }
+}
+
 
 // Funzione di registrazione
 export async function registerUser(formData, portfolioProjects) {

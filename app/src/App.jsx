@@ -10,7 +10,7 @@ import InserireVideo from './components/pages/InserireVideo';
 import Video from './components/pages/Video';  // Componente per la lista dei video
 import DettaglioVideo from './components/pages/DettaglioVideo';
 import HomePageUtente from './components/pages/HomePageUtente'
-import MentorProfileForm from './components/pages/ModifyProfile';
+import ModificaProfilo from './components/pages/ModificaProfilo';
 import {DettagliUtenteWrapper} from './components/pages/DettaglioUtente';
 import { AuthProvider } from './auth/auth-context';
 import PrivateRoutes from './PrivateRoutes';
@@ -32,6 +32,7 @@ function App() {
           <Route path="/dettagli/:userId" element={<DettagliUtenteWrapper/>} />
           <Route path="/HomePageUtente" element={<HomePageUtente />} />
           <Route path="/profile" element={<DettaglioProfilo/>} />
+          <Route path="/edit-profile" element={<ModificaProfilo />}/>
           <Route path="/mentorsearch" element={<MentorSearchForm />} />
           <Route path="/contents" element={<FileHomePage />} />
           <Route path="/videos" element={<Video />} />

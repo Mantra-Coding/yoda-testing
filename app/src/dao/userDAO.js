@@ -1,6 +1,8 @@
 // Importa i metodi necessari da Firebase Firestore
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, getDoc, doc } from "firebase/firestore";
+import { getFirestore, getDoc, doc, updateDoc} from "firebase/firestore";
+import { updateCV } from "@/auth/user-registration";
+
 // Inizializza Firestore
 const db = getFirestore();
 const auth = getAuth();
@@ -25,6 +27,58 @@ export async function getCurrentUserUID() {
     });
   });
 }
+
+export async function updateUserProfile(uid, profileData) {
+  try {
+    const userDocRef = doc(db, 'utenti', uid); // La collezione è 'utenti'
+    await updateDoc(userDocRef, profileData);
+    console.log('Profilo aggiornato con successo!');
+    return { success: true }; // Ritorna un oggetto di successo
+  } catch (error) {
+    console.error('Errore durante l\'aggiornamento del profilo:', error);
+    return { success: false, error: error.message }; // Ritorna un oggetto di errore
+  }
+}
+
+
+export async function updateUserProfileWithCV(userId, formData) {
+  try {
+    // Crea un oggetto per i dati da aggiornare
+    const updatedData = {
+      nome: formData.nome,
+      cognome: formData.cognome,
+      sesso: formData.genere,
+      titoloDiStudio: formData.titoloDiStudio,
+      competenze: formData.competenze,
+      occupazione: formData.occupazione,
+      field: formData.field || "",
+      updatedAt: new Date().toISOString(), // Aggiungi la data dell'ultimo aggiornamento
+    };
+
+    // Se l'utente ha caricato un nuovo CV, gestiscilo
+    let cvURL = formData.cv ? await updateCV(formData.cv, userId, formData.oldCvURL) : formData.oldCvURL;
+
+    // Aggiungi l'URL del CV aggiornato
+    if (cvURL) {
+      updatedData.cv = cvURL;
+    }
+
+    // Aggiorna i dati utente in Firestore
+    const updateResult = await updateUserProfile(userId, updatedData);
+
+    if (updateResult.success) {
+      console.log("Profilo e CV aggiornati con successo!");
+      return { success: true };
+    } else {
+      return { success: false, error: updateResult.error };
+    }
+  } catch (error) {
+    console.error("Errore durante l'aggiornamento del profilo completo:", error.message);
+    return { success: false, error: error.message };
+  }
+
+}
+
 
 
 /**
