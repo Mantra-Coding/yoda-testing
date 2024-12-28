@@ -12,9 +12,10 @@ import Video from './components/pages/Video';  // Componente per la lista dei vi
 import DettaglioVideo from './components/pages/DettaglioVideo';
 import HomePageUtente from './components/pages/HomePageUtente'
 import MentorProfileForm from './components/pages/ModifyProfile';
-import DettagliUtenteWrapper from './components/pages/DettaglioUtente';
+import {DettagliUtenteWrapper} from './components/pages/DettaglioUtente';
 import { AuthProvider } from './auth/auth-context';
 import PrivateRoutes from './PrivateRoutes';
+import DettaglioProfilo from './components/pages/DettaglioProfilo';
 
 function App() {
   const db = app;
@@ -27,6 +28,7 @@ function App() {
         <Route path="/register" element={<RegistrationPage/>}/>
         <Route path="/login" element={<LoginPage/>}/>
         <Route element={<PrivateRoutes/>}>
+          <Route path="/profile" element={<DettaglioProfilo />}/>
           <Route path="/dettagli/:userId" element={<DettagliUtenteWrapper/>} />
           <Route path="/HomePageUtente" element={<HomePageUtente />} />
           <Route path="/profile" element={<MentorProfileForm/>}/>
