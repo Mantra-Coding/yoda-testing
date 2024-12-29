@@ -1,38 +1,30 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { Button } from './components/ui/button'
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import UploadPage from "./pages/UploadPage";
+import Error404 from "./components/pages/Error404";
+import Error500 from "./components/pages/Error500";
+import Error403 from "./components/pages/Error403";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-      <div>
-        <Button>YODA</Button>  
+    <Router>
+      <Routes>
+        {/* Rotta Home */}
+        <Route path="/" element={<h1>Home</h1>} />
 
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+        {/* Pagina di caricamento */}
+        <Route path="/upload" element={<UploadPage />} />
 
-export default App
+        {/* Pagine di errore */}
+        <Route path="/error/404" element={<Error404 />} />
+        <Route path="/error/500" element={<Error500 />} />
+        <Route path="/error/403" element={<Error403 />} />
+
+        {/* Rotta di fallback */}
+        <Route path="*" element={<Error404 />} />
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;

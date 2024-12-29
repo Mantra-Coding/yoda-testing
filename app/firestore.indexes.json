@@ -1,0 +1,37 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "mentors",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "meetingMode",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "availability",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "utenti",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "meetingMode",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occupazione",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "availability",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
