@@ -104,7 +104,7 @@ const handleFileChange = (event) => {
           cv: selectedFile, // Include il file selezionato
           availability: userType === "mentor" ? formData.availability : null,
           field: userType === "mentee" ? formData.field : null, // Include il campo di interesse per i Mentee
-        }//portfolioProjects
+        }
       );
       
   
@@ -499,7 +499,7 @@ const handleFileChange = (event) => {
                         <Input placeholder="Nome del progetto" value={newProject.name} onChange={(e) => setNewProject(prev => ({ ...prev, name: e.target.value }))} />
                         <Input placeholder="Descrizione del progetto" value={newProject.description} onChange={(e) => setNewProject(prev => ({ ...prev, description: e.target.value }))} />
                         <Input placeholder="URL del progetto (opzionale)" value={newProject.url} onChange={(e) => setNewProject(prev => ({ ...prev, url: e.target.value }))} />
-                        <Button onClick={handleAddProject} className="bg-[#178563] text-white hover:bg-[#178563]/90">
+                        <Button type = "button" onClick={handleAddProject} className="bg-[#178563] text-white hover:bg-[#178563]/90">
                           <Plus size={16} />
                         </Button>
                       </div>

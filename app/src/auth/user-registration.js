@@ -1,7 +1,7 @@
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { storage } from "@/firebase/firebase";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, deleteObject, listAll } from "firebase/storage";
 import app from "@/firebase/firebase";
 
 // Funzione per caricare il CV su Firebase Storage
@@ -25,15 +25,24 @@ export async function uploadCV(file, userID) {
 
 // Funzione per caricare o aggiornare il CV
 
-export async function updateCV(file, userId, oldCvURL = null) {
+export async function updateCV(file, userId) {
   try {
-    const cvRef = ref(storage, `utenti/${userId}/cv/${file.name}`);
+    const path = `utenti/${userId}/cv`;
+    const filePath = path+`/${file.name}`;
+    const cvRef = ref(storage, filePath);
+    console.log(path);
+    
+    // Riferimento al percorso specificato
+    const listRef = ref(storage, path);
 
-    // Se c'è un vecchio CV, rimuoviamolo prima di caricare il nuovo
-    if (oldCvURL) {
-      const oldCvRef = ref(storage, oldCvURL);
-      await deleteObject(oldCvRef);
-    }
+    // Ottieni la lista dei file presenti nel percorso
+    const res = await listAll(listRef);
+
+    // Cancella ogni file nel percorso
+    for (const itemRef of res.items) {
+      await deleteObject(itemRef);
+      console.log(`File eliminato: ${itemRef.fullPath}`);
+    }    
 
     // Carica il nuovo CV nel percorso definito
     await uploadBytes(cvRef, file);
