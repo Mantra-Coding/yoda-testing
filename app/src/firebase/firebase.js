@@ -1,4 +1,5 @@
-import { initializeApp } from "firebase/app"; 
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 import { getStorage, connectStorageEmulator } from "firebase/storage";
 
 // La tua configurazione Firebase
@@ -15,6 +16,9 @@ const firebaseConfig = {
 // Inizializza Firebase
 const app = initializeApp(firebaseConfig);
 
+// Ottieni Firestore
+const db = getFirestore(app);
+
 // Configura Firebase Storage
 const storage = getStorage(app);
 if (window.location.hostname === "localhost") {
@@ -22,6 +26,6 @@ if (window.location.hostname === "localhost") {
     connectStorageEmulator(storage, "localhost", 9199);
 }
 
-// Esporta app e storage
-export { app, storage };
+// Esporta app, storage e firebaseConfig
+export { app, storage, db, firebaseConfig };
 export default app;
