@@ -21,6 +21,11 @@ function PrivateRoutes({roles}) {
     }
   }
   else {
+    // Se l'utente è loggato, controlliamo se è nella home o in registrazione
+    if (location.pathname === '/' || location.pathname === '/register' || location.pathname === '/login') {
+     // Se è già loggato, redirigilo alla HomePageUtente
+      return <Navigate to="/HomePageUtente" replace />;
+        }
     if (!roles.includes(userType)) {
       console.log("[PRIVATE ROUTES] L\'utente non dispone dei permessi necessari");
       return <div>Non hai i permessi necessari</div>}

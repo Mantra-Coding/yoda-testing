@@ -1,6 +1,10 @@
 import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { useAuth } from "./auth-context";
 
+/* 
+    --| metodi Login e Logout importati da libreria Firebase
+
+ */
 // Funzione di login
 async function loginUser(email, password) {
   try {

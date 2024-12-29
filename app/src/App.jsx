@@ -23,10 +23,10 @@ function App() {
     <AuthProvider>
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage/>}/> 
         <Route element={<PrivateRoutes roles={[]}/>}>
             <Route path="/" element={<Home />} /> 
             <Route path="/register" element={<RegistrationPage/>}/>
+            <Route path="/login" element={<LoginPage/>}/> 
         </Route>
         <Route element={<PrivateRoutes roles={["mentor","mentee"]}/>}>
           <Route path="/dettagli/:userId" element={<DettagliUtenteWrapper/>} />

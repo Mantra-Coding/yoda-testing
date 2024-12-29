@@ -3,6 +3,8 @@ import { useAuth } from "@/auth/auth-context";
 import { getUserByID } from "@/dao/userDAO";
 import { DettagliUtente } from "./DettaglioUtente";
 
+/* 
+ */
 export default function DettaglioProfilo() {
   const { userId } = useAuth(); // Recupera l'ID dell'utente autenticato
   const [userData, setUserData] = useState(null); // Stato per i dati dell'utente

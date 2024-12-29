@@ -9,6 +9,22 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/auth/auth-context';
 
+
+/* 
+    Componente DettagliUtente
+    ---------------------------
+    - Visualizza i dettagli di un utente specifico.
+    - Mostra informazioni come email, data di nascita, titolo di studio, ecc.
+    - Fornisce pulsanti azione contestuali:
+        - Modifica Profilo (se l'utente sta visualizzando il proprio profilo)
+        - Richiedi Mentorship (se l'utente è un mentee e visualizza un mentore)
+        - Contatta il Mentee (se l'utente è un mentore e visualizza un mentee)
+    
+    Props:
+    - user: Oggetto con i dettagli dell'utente.
+*/
+
+
 function DettagliUtente({ user }) {
   const isMentor = user.userType === "mentor";
   const {userId} = useAuth();
@@ -184,6 +200,17 @@ function DettagliUtente({ user }) {
     </div>
   );
 }
+
+
+  /* 
+    Componente DettagliUtenteWrapper
+    ---------------------------------
+    - Recupera l'ID dell'utente dai parametri URL.
+    - Recupera i dati dell'utente dal backend utilizzando `getUserByID`.
+    - Gestisce stati di caricamento ed errori.
+    - Passa i dati utente al componente `DettagliUtente`.
+*/
+
 
 
 function DettagliUtenteWrapper() {

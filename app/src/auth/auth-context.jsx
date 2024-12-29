@@ -2,6 +2,12 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
+/*  --| Contesto per gestione dei parametri 
+        --\ userId
+        --\ userType
+        --\ nome
+        --\ isLogged
+ */
 // Creazione del contesto di autenticazione
 const AuthContext = createContext();
 
