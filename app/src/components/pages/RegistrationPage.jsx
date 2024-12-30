@@ -72,8 +72,8 @@ const handleFileChange = (event) => {
       if (!formData.userType) newErrors.userType = 'Tipo di utente è obbligatorio';
       if (!formData.titoloDiStudio) newErrors.titoloDiStudio = 'Titolo di studio è obbligatorio';
       if (!formData.competenze) newErrors.competenze = 'Competenze sono obbligatorie';
-      
       if (formData.userType === "mentor") {
+      if (!formData.occupazione) newErrors.occupazione = "Il Settore IT è obbligatorio"
         if (
           !formData.availability ||
           formData.availability < 1 ||

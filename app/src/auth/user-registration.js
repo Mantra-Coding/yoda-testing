@@ -96,6 +96,7 @@ export async function registerUser(formData, portfolioProjects) {
       occupazione: formData.occupazione, // Aggiornato per accettare valori specifici come "developer", "web-developer", ecc.
       userType: formData.userType,
       portfolioProjects: portfolioProjects || [],
+      impiego: formData.impiego,
       cv: cvURL, // Salva il nome del file CV
       createdAt: new Date().toISOString(), // Aggiunto per tracciare la data di registrazione
       field: formData.field || "", // Aggiunto per gestire il campo di interesse sia per mentor che mentee

@@ -69,6 +69,9 @@ export async function updateUserProfileWithCV(userId, formData) {
   try {
     // Crea un oggetto con i dati da aggiornare
     const updatedData = {
+      meetingMode: formData.meetingMode,
+      availability: formData.availability,
+      impiego: formData.impiego,
       portfolioProjects: formData.portfolioProjects,  // Progetti nel portfolio dell'utente
       nome: formData.nome,                            // Nome dell'utente
       cognome: formData.cognome,                      // Cognome dell'utente
