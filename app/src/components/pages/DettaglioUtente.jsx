@@ -3,7 +3,7 @@ import Header from '../ui/Header';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from '@/components/ui/badge';
-import { Mail, Phone, MapPin, Briefcase, GraduationCap, Users, Cake, ArrowRight, Download, Clock } from 'lucide-react';
+import { Mail, MapPin, Briefcase, GraduationCap, Users, Cake, ArrowRight, Download, Clock } from 'lucide-react';
 import { getUserByID } from '@/dao/userDAO';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';

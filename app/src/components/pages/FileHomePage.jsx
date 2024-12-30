@@ -1,8 +1,5 @@
-"use client"
-
 import { useEffect, useState } from 'react'
 import { getFirestore, collection, getDocs } from 'firebase/firestore'
-import { getAuth } from "firebase/auth"
 import app from '../../firebase/firebase' // Import dell'istanza di Firebase
 import Header from '@/components/ui/Header'
 import {

@@ -114,9 +114,6 @@ const handleFileChange = (event) => {
       
   
       if (response.success) {
-        // Ottieni l'ID utente registrato
-        const userId = response.userId;
-  
         setFeedbackMessage(
           "Registrazione completata con successo. Verrai reindirizzato alla Home page tra 3 secondi."
         );
@@ -575,7 +572,7 @@ const handleFileChange = (event) => {
                         <Input placeholder="Nome del progetto" value={newProject.name} onChange={(e) => setNewProject(prev => ({ ...prev, name: e.target.value }))} />
                         <Input placeholder="Descrizione del progetto" value={newProject.description} onChange={(e) => setNewProject(prev => ({ ...prev, description: e.target.value }))} />
                         <Input placeholder="URL del progetto (opzionale)" value={newProject.url} onChange={(e) => setNewProject(prev => ({ ...prev, url: e.target.value }))} />
-                        <Button onClick={handleAddProject} className="bg-[#178563] text-white hover:bg-[#178563]/90">
+                        <Button type = "button" onClick={handleAddProject} className="bg-[#178563] text-white hover:bg-[#178563]/90">
                           <Plus size={16} />
                         </Button>
                       </div>
