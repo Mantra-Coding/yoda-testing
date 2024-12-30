@@ -1,5 +1,5 @@
 import React from "react";
-import { uploadFile } from "../uploadFile";
+import { uploadFile } from "@/components/ui/uploadFile";
 
 const FileUploader = ({ onUploadComplete }) => {
     const handleFileChange = async (event) => {

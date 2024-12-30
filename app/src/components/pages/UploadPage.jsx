@@ -1,5 +1,5 @@
 import React from "react";
-import FileUploader from "../components/FileUploader";
+import FileUploader from "@/components/pages/FileUploader";
 
 const UploadPage = () => {
     const handleUploadComplete = (url) => {

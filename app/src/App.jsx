@@ -1,16 +1,14 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import UploadPage from "./pages/UploadPage";
+import React from "react"; // Importa React esplicitamente, se necessario
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import UploadPage from "./components/pages/UploadPage";
 import Error404 from "./components/pages/Error404";
 import Error500 from "./components/pages/Error500";
 import Error403 from "./components/pages/Error403";
 
 const App = () => {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        {/* Rotta Home */}
-        <Route path="/" element={<h1>Home</h1>} />
 
         {/* Pagina di caricamento */}
         <Route path="/upload" element={<UploadPage />} />
@@ -23,7 +21,7 @@ const App = () => {
         {/* Rotta di fallback */}
         <Route path="*" element={<Error404 />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 };
 
