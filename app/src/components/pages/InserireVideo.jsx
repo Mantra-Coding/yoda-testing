@@ -8,10 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Upload } from 'lucide-react';
 import { collection, addDoc, getFirestore } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import app, { storage } from '@/Firebase/firebase'; // Assicurati che storage venga importato
-import { getAuth } from 'firebase/auth'; // Importazione per l'autenticazione
+import app, { storage } from '@/firebase/firebase'; // Assicurati che storage venga importato
+import { useAuth } from '@/auth/auth-context'; // Assicurati di importare il contesto di autenticazione
 
 export default function InserireVideo() {
+  const { userType } = useAuth(); // Ottieni il tipo di utente dal contesto di autenticazione
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [videoFile, setVideoFile] = useState(null);
@@ -21,7 +22,6 @@ export default function InserireVideo() {
   const [descriptionError, setDescriptionError] = useState('');
   const [videoError, setVideoError] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(true); // Stato per verificare se l'utente è autorizzato
   const navigate = useNavigate();
   const db = getFirestore(app);
 
@@ -30,30 +30,12 @@ export default function InserireVideo() {
     setVideoFile(null);
   };
 
+  // Effettua il controllo del ruolo dell'utente
   useEffect(() => {
-    // Controllo autenticazione e ruolo
-    const auth = getAuth();
-    const user = auth.currentUser;
-
-    if (!user) {
-      setIsAuthorized(false); // Se l'utente non è loggato
-      return;
+    if (userType !== "admin" && userType !== "mentor") {
+      navigate('/videos'); // Redirige alla pagina dei video se l'utente non è admin o mentor
     }
-
-    // Controlla il ruolo dell'utente nel Firestore (esempio con campo "role")
-    const userRef = collection(db, "users"); // Supponiamo che gli utenti siano nella collezione "users"
-    const userDoc = userRef.doc(user.uid);
-    userDoc.get().then((docSnapshot) => {
-      if (docSnapshot.exists) {
-        const userData = docSnapshot.data();
-        if (userData.role !== 'admin') {
-          setIsAuthorized(false); // Se non è un admin, accesso negato
-        }
-      } else {
-        setIsAuthorized(false); // Se l'utente non esiste nel database
-      }
-    });
-  }, [db]);
+  }, [userType, navigate]);
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -112,18 +94,6 @@ export default function InserireVideo() {
     } finally {
       setUploading(false);
     }
-  }
-
-  // Se l'utente non è autorizzato, mostra il messaggio di accesso negato
-  if (!isAuthorized) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="bg-white p-6 rounded-lg shadow-md text-center">
-          <h2 className="text-2xl font-semibold text-red-600">Accesso Negato</h2>
-          <p className="text-lg text-gray-700">Non hai i permessi per accedere a questa pagina.</p>
-        </div>
-      </div>
-    );
   }
 
   return (
