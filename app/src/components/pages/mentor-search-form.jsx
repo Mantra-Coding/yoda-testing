@@ -309,7 +309,6 @@ export function MentorSearchForm() {
                 </Button>
               </div>
 
-
               {/* Risultati */}
               {loading && <p>Caricamento...</p>}
               {error && <p className="text-red-600">{error}</p>}
@@ -360,11 +359,6 @@ export function MentorSearchForm() {
                   </div>
                 </div>
               )}
-
-
-
-
-
             </div>
           </CardContent>
         </Card>

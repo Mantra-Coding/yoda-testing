@@ -72,7 +72,7 @@ function ModificaProfilo() {
         if (userType === 'mentee') {
           initialData.field = userData.field || '';
         } else if (userType === 'mentor') {
-          initialData.settoreIT = userData.settoreIT || '';
+          initialData.settoreIT = userData.occupazione || '';
           initialData.availability = userData.availability || null;
           initialData.occupazione = userData.impiego || '';
           initialData.meetingMode = userData.meetingMode || '';
@@ -154,8 +154,9 @@ function ModificaProfilo() {
       const submissionData = {
         ...formData,
         cv: selectedFile,
+        impiego: userType === 'mentor' ? formData.occupazione : null,
         availability: userType === 'mentor' ? formData.availability : null,
-        occupazione: userType === 'mentor' ? formData.impiego : null,
+        occupazione: userType === 'mentor' ? formData.settoreIT : null,
         field: userType === 'mentee' ? formData.field : null,
         portfolioProjects: portfolioProjects,
       };
@@ -332,8 +333,8 @@ function ModificaProfilo() {
                     {/*Sezione per l'occupazione*/}
                     <Label htmlFor="occupazione">Settore IT</Label>
                     <Select
-                      value={formData.occupazione}
-                      onValueChange={(value) => setFormData((prev) => ({ ...prev, occupazione: value }))}
+                      value={formData.settoreIT}
+                      onValueChange={(value) => setFormData((prev) => ({ ...prev, settoreIT: value }))}
                     >
                       <SelectTrigger id="occupazione">
                         <SelectValue placeholder="Seleziona la tua occupazione" />
@@ -397,9 +398,9 @@ function ModificaProfilo() {
                     <Input
                       type="text"
                       id="impiego"
-                      value={formData.impiego}
+                      value={formData.occupazione}
                       onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, impiego: e.target.value }))
+                        setFormData((prev) => ({ ...prev, occupazione: e.target.value }))
                       }
                       placeholder="Inserisci il tuo impiego"
                       className="border border-gray-300 rounded px-2 py-1 w-full"

@@ -103,6 +103,7 @@ export async function registerUser(formData, portfolioProjects) {
 
     // Aggiungi proprietà specifiche per i mentor
     if (formData.userType === "mentor") {
+      userData.impiego = formData.impiego,
       userData.availability = formData.availability || 0; // Disponibilità settimanale
       userData.meetingMode = formData.meetingMode || "online"; // Modalità di incontro
     }

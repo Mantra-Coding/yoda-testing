@@ -1,8 +1,5 @@
-"use client"
-
 import { useEffect, useState } from 'react'
 import { getFirestore, collection, getDocs } from 'firebase/firestore'
-import { getAuth } from "firebase/auth"
 import app from '../../firebase/firebase' // Import dell'istanza di Firebase
 import Header from '@/components/ui/Header'
 import {
@@ -12,10 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Link } from 'react-router-dom'
+import { useAuth } from '@/auth/auth-context'
 
 export default function DocumentLibrary() {
   const [documents, setDocuments] = useState([])
-
+  const {userType} = useAuth();
   useEffect(() => {
     const db = getFirestore(app) // Inizializza Firestore
     const fetchDocuments = async () => {
@@ -43,14 +41,14 @@ export default function DocumentLibrary() {
         <h2 className="text-2xl font-semibold text-white mb-6">Contenuti Media</h2>
         
         {/* Add Document Button */}
-        <div className="mb-6">
+        {userType === "mentor" && (<div className="mb-6">
           <Link
             to="/addfile"
             className="bg-[#178563] hover:bg-[#178563]/90 text-white px-4 py-2 rounded-md"
           >
             Aggiungi Documento
           </Link>
-        </div>
+        </div>)}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {documents.map((doc) => (
