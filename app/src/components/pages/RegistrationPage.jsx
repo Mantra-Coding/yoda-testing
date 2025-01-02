@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
@@ -9,9 +7,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { X, Plus } from 'lucide-react'
-import { toast } from "@/hooks/use-toast"
 import Header from "@/components/ui/Header"
 import { registerUser } from '@/auth/user-registration'
+import { useNavigate } from "react-router-dom";
 
 
 function RegistrationForm() {
@@ -28,7 +26,8 @@ function RegistrationForm() {
     competenze: '',
     occupazione: '',
     cv: null,
-    userType: ''
+    userType: '',
+    availability: null,
   })
   const [portfolioProjects, setPortfolioProjects] = useState([])
   const [newProject, setNewProject] = useState({ name: '', description: '', url: '' })
@@ -43,13 +42,11 @@ function RegistrationForm() {
     setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    if (files && files[0]) {
-      setFormData(prev => ({ ...prev, [name]: files[0] }));
-    }
-  };
-
+const [selectedFile, setSelectedFile] = useState(null);
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  setSelectedFile(file); // Aggiorna lo stato con il file selezionato
+};
   const handleAddProject = () => {
     if (newProject.name && newProject.description) {
       setPortfolioProjects(prev => [...prev, { ...newProject, id: Date.now().toString() }]);
@@ -75,94 +72,132 @@ function RegistrationForm() {
       if (!formData.userType) newErrors.userType = 'Tipo di utente è obbligatorio';
       if (!formData.titoloDiStudio) newErrors.titoloDiStudio = 'Titolo di studio è obbligatorio';
       if (!formData.competenze) newErrors.competenze = 'Competenze sono obbligatorie';
-      if (!formData.occupazione) newErrors.occupazione = 'Occupazione è obbligatorio';
+      if (formData.userType === "mentor") {
+      if (!formData.occupazione) newErrors.occupazione = "Il Settore IT è obbligatorio"
+        if (
+          !formData.availability ||
+          formData.availability < 1 ||
+          formData.availability > 10
+        ) {
+          newErrors.availability = "Seleziona una disponibilità valida (1-10 ore)";
+        }
+      } else if (formData.userType === "mentee") {
+        if (!formData.field) {
+          newErrors.field = "Campo di interesse è obbligatorio per i Mentee";
+        }
+      }
     }
+    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (!validateForm()) return;
   
     try {
-      const response = await registerUser(formData, portfolioProjects);
+      // Passa il formData con il file CV e gli altri dati
+      const response = await registerUser(
+        {
+          ...formData,
+          cv: selectedFile, // Include il file selezionato
+          availability: formData.userType === "mentor" ? formData.availability : null,
+          field: formData.userType === "mentee" ? formData.field : null, // Include il campo di interesse per i Mentee
+        },
+        portfolioProjects
+      );
+      
+  
       if (response.success) {
-        setFeedbackMessage("Registrazione completata con successo! Il tuo account è stato creato.");
+        setFeedbackMessage(
+          "Registrazione completata con successo. Verrai reindirizzato alla Home page tra 3 secondi."
+        );
         setFeedbackType("success");
+  
+        // Reindirizza alla pagina di login dopo 3 secondi
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
       } else {
         throw new Error(response.error);
       }
     } catch (err) {
-      setFeedbackMessage(err.message || "Errore durante la registrazione. Per favore riprova.");
+      console.error("Errore durante la registrazione:", err.message);
+      setFeedbackMessage(
+        err.message || "Errore durante la registrazione. Per favore riprova."
+      );
       setFeedbackType("error");
     }
   };
   
   
 
+
   return (
     <>
-    <div className="min-h-screen bg-gradient-to-b from-[#178563] to-white text-black">
-      <Header />
-      <div className="mt-8"></div>
+      <div className="min-h-screen bg-gradient-to-b from-[#178563] to-white text-black">
+        <Header />
+        <div className="mt-8"></div>
         <Card className="mx-auto max-w-2xl border-[#178563] border-2 bg-white backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-[#178563]">Registrazione Mentore o Mentee</CardTitle>
             <CardDescription>Compila il form per registrarti come Mentore o Mentee</CardDescription>
           </CardHeader>
           <CardContent>
-          {feedbackMessage && (
-  <div
-    className={`flex items-center gap-4 p-4 mb-4 text-sm rounded-lg shadow-md transition-transform transform ${
-      feedbackType === "success"
-        ? "bg-green-50 text-green-800 border border-green-300"
-        : "bg-red-50 text-red-800 border border-red-300"
-    }`}
-    role="alert"
-  >
-    <span
-      className={`flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full ${
-        feedbackType === "success" ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"
-      }`}
-    >
-      {feedbackType === "success" ? (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-      ) : (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M18.364 5.636l-1.414 1.414M5.636 18.364l-1.414-1.414M12 3v18m9-9H3"
-          />
-        </svg>
-      )}
-    </span>
-    <span className="flex-grow">{feedbackMessage}</span>
-    <button
-      type="button"
-      onClick={() => setFeedbackMessage(null)}
-      className="text-sm font-medium text-gray-500 hover:text-gray-700"
-    >
-      ✕
-    </button>
-  </div>
-)}
+            {feedbackMessage && (
+              <div
+                className={`flex items-center gap-4 p-4 mb-4 text-sm rounded-lg shadow-md transition-transform transform ${feedbackType === "success"
+                    ? "bg-green-50 text-green-800 border border-green-300"
+                    : "bg-red-50 text-red-800 border border-red-300"
+                  }`}
+                role="alert"
+              >
+                <span
+                  className={`flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full ${feedbackType === "success" ? "bg-green-200 text-green-700" : "bg-red-200 text-red-700"
+                    }`}
+                >
+                  {feedbackType === "success" ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M18.364 5.636l-1.414 1.414M5.636 18.364l-1.414-1.414M12 3v18m9-9H3"
+                      />
+                    </svg>
+                  )}
+                </span>
+                <span className="flex-grow">{feedbackMessage}</span>
+                <button
+                  type="button"
+                  onClick={() => setFeedbackMessage(null)}
+                  className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} noValidate>
               {step === 1 && (
@@ -302,21 +337,190 @@ function RegistrationForm() {
                     />
                     {errors.competenze && <p id="competenze-error" className="text-red-500 text-sm">{errors.competenze}</p>}
                   </div>
+                  {userType === "mentor" && (
+  <div>
+    <Label htmlFor="occupazione">Settore IT</Label>
+    <Select
+      value={formData.occupazione}
+      onValueChange={(value) =>
+        setFormData((prev) => ({ ...prev, occupazione: value }))
+      }
+    >
+      <SelectTrigger id="occupazione">
+        <SelectValue placeholder="Seleziona la tua occupazione" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="software-development">Sviluppo Software</SelectItem>
+        <SelectItem value="web-development">Sviluppo Web</SelectItem>
+        <SelectItem value="mobile-development">Sviluppo Mobile</SelectItem>
+        <SelectItem value="data-science">Data Science</SelectItem>
+        <SelectItem value="machine-learning">Machine Learning</SelectItem>
+        <SelectItem value="artificial-intelligence">
+          Intelligenza Artificiale
+        </SelectItem>
+        <SelectItem value="cybersecurity">Cybersecurity</SelectItem>
+        <SelectItem value="cloud-computing">Cloud Computing</SelectItem>
+        <SelectItem value="networking">Networking</SelectItem>
+        <SelectItem value="devops">DevOps</SelectItem>
+        <SelectItem value="blockchain">Blockchain</SelectItem>
+        <SelectItem value="game-development">Sviluppo Videogiochi</SelectItem>
+        <SelectItem value="it-support">Supporto IT</SelectItem>
+        <SelectItem value="ui-ux-design">Design UI/UX</SelectItem>
+        <SelectItem value="software-testing">Testing Software</SelectItem>
+        <SelectItem value="database-administration">
+          Amministrazione Database
+        </SelectItem>
+        <SelectItem value="robotics">Robotica</SelectItem>
+        <SelectItem value="iot">Internet of Things (IoT)</SelectItem>
+        <SelectItem value="digital-transformation">
+          Trasformazione Digitale
+        </SelectItem>
+        <SelectItem value="big-data">Big Data</SelectItem>
+      </SelectContent>
+    </Select>
+    {errors.occupazione && (
+      <p id="occupazione-error" className="text-red-500 text-sm">
+        {errors.occupazione}
+      </p>
+    )}
+  </div>
+)}
 
-                  <div className="space-y-2">
-                    <Label htmlFor="occupazione">Occupazione</Label>
-                    <Input
-                      id="occupazione"
-                      name="occupazione"
-                      value={formData.occupazione}
-                      onChange={handleInputChange}
-                      placeholder="Inserisci la tua occupazione"
-                      className="focus:ring-[#178563] focus:border-[#178563]"
-                      aria-invalid={errors.occupazione ? "true" : "false"}
-                      aria-describedby={errors.occupazione ? "occupazione-error" : undefined}
-                    />
-                    {errors.occupazione && <p id="occupazione-error" className="text-red-500 text-sm">{errors.occupazione}</p>}
-                  </div>
+
+{userType === "mentee" && (
+  <div>
+    <Label htmlFor="field">Campo di Interesse</Label>
+    <Select
+      value={formData.field}
+      onValueChange={(value) =>
+        setFormData((prev) => ({ ...prev, field: value }))
+      }
+    >
+      <SelectTrigger id="field">
+        <SelectValue placeholder="Seleziona il tuo campo di interesse" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="software-development">Sviluppo Software</SelectItem>
+        <SelectItem value="web-development">Sviluppo Web</SelectItem>
+        <SelectItem value="mobile-development">Sviluppo Mobile</SelectItem>
+        <SelectItem value="data-science">Data Science</SelectItem>
+        <SelectItem value="machine-learning">Machine Learning</SelectItem>
+        <SelectItem value="artificial-intelligence">
+          Intelligenza Artificiale
+        </SelectItem>
+        <SelectItem value="cybersecurity">Cybersecurity</SelectItem>
+        <SelectItem value="cloud-computing">Cloud Computing</SelectItem>
+        <SelectItem value="networking">Networking</SelectItem>
+        <SelectItem value="devops">DevOps</SelectItem>
+        <SelectItem value="blockchain">Blockchain</SelectItem>
+        <SelectItem value="game-development">Sviluppo Videogiochi</SelectItem>
+        <SelectItem value="it-support">Supporto IT</SelectItem>
+        <SelectItem value="ui-ux-design">Design UI/UX</SelectItem>
+        <SelectItem value="software-testing">Testing Software</SelectItem>
+        <SelectItem value="database-administration">
+          Amministrazione Database
+        </SelectItem>
+        <SelectItem value="robotics">Robotica</SelectItem>
+        <SelectItem value="iot">Internet of Things (IoT)</SelectItem>
+        <SelectItem value="digital-transformation">
+          Trasformazione Digitale
+        </SelectItem>
+        <SelectItem value="big-data">Big Data</SelectItem>
+      </SelectContent>
+    </Select>
+    {errors.field && (
+      <p id="field-error" className="text-red-500 text-sm">
+        {errors.field}
+      </p>
+    )}
+  </div>
+)}
+
+
+                  {userType === "mentor" && (
+                    <div className="space-y-2">
+                      <Label>Disponibilità (ore settimanali)</Label>
+                      <div className="mt-2 flex space-x-2">
+                        {[...Array(10)].map((_, i) => (
+                          <Button
+                            key={i}
+                            type="button" // Aggiunto per impedire il comportamento di submit
+                            variant={formData.availability === i + 1 ? "default" : "outline"}
+                            className={`h-8 w-8 p-0 ${formData.availability === i + 1 ? "bg-emerald-600" : ""
+                              }`}
+                            onClick={() =>
+                              setFormData((prev) => ({ ...prev, availability: i + 1 }))
+                            }
+                          >
+                            {i + 1}
+                          </Button>
+
+                        ))}
+                      </div>
+                      {errors.availability && (
+                        <p className="text-red-500 text-sm">{errors.availability}</p>
+                      )}
+                    </div>
+                  )}
+
+{userType === "mentor" && (
+  <div>
+    {/* Stringa impiego per i mentor */}
+    <Label htmlFor="impiego">Impiego</Label>
+    <input
+      type="text"
+      id="impiego"
+      value={formData.impiego}
+      onChange={(e) =>
+        setFormData((prev) => ({ ...prev, impiego: e.target.value }))
+      }
+      placeholder="Inserisci il tuo impiego"
+      className="border border-gray-300 rounded px-2 py-1 w-full"
+    />
+    {errors.impiego && (
+      <p id="impiego-error" className="text-red-500 text-sm">
+        {errors.impiego}
+      </p>
+    )}
+  </div>
+)}
+
+
+
+
+{userType === "mentor" && (
+  <>
+    <div className="space-y-2">
+      <Label htmlFor="meetingMode">Modalità di incontro</Label>
+      <Select
+        value={formData.meetingMode || ''} // Fallback a stringa vuota per evitare il warning di React
+        onValueChange={(value) =>
+          setFormData((prev) => ({ ...prev, meetingMode: value }))
+        }
+      >
+        <SelectTrigger id="meetingMode">
+          <SelectValue placeholder="Seleziona la modalità di incontro" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="online">Online</SelectItem>
+          <SelectItem value="in-person">Di persona</SelectItem>
+          <SelectItem value="hybrid">Ibrida</SelectItem>
+        </SelectContent>
+      </Select>
+      {errors.meetingMode && (
+        <p id="meetingMode-error" className="text-red-500 text-sm">
+          {errors.meetingMode}
+        </p>
+      )}
+    </div>
+  </>
+)}
+
+
+
+
+
+
                   <div className="space-y-2">
                     <Label htmlFor="userType">Tipo di Utente</Label>
                     <RadioGroup
@@ -368,7 +572,7 @@ function RegistrationForm() {
                         <Input placeholder="Nome del progetto" value={newProject.name} onChange={(e) => setNewProject(prev => ({ ...prev, name: e.target.value }))} />
                         <Input placeholder="Descrizione del progetto" value={newProject.description} onChange={(e) => setNewProject(prev => ({ ...prev, description: e.target.value }))} />
                         <Input placeholder="URL del progetto (opzionale)" value={newProject.url} onChange={(e) => setNewProject(prev => ({ ...prev, url: e.target.value }))} />
-                        <Button onClick={handleAddProject} className="bg-[#178563] text-white hover:bg-[#178563]/90">
+                        <Button type = "button" onClick={handleAddProject} className="bg-[#178563] text-white hover:bg-[#178563]/90">
                           <Plus size={16} />
                         </Button>
                       </div>

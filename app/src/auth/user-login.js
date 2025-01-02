@@ -1,5 +1,10 @@
-import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useAuth } from "./auth-context";
 
+/* 
+    --| metodi Login e Logout importati da libreria Firebase
+
+ */
 // Funzione di login
 async function loginUser(email, password) {
   try {
@@ -9,11 +14,8 @@ async function loginUser(email, password) {
     // Effettua il login con email e password
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-    // Ottieni l'utente autenticato
-    const user = userCredential.user;
-
-    console.log("Login effettuato con successo!", user.uid);
-    return { success: true, userId: user.uid, email: user.email };
+    console.log("Login effettuato con successo!", userCredential.uid);
+    return { success: true, userId: userCredential.uid, email: userCredential.email };
   } catch (error) {
     console.error("Errore durante il login:", error.message);
     return { success: false, error: error.message };
@@ -22,19 +24,8 @@ async function loginUser(email, password) {
 
 // Funzione di logout
 async function logoutUser() {
-  try {
-    // Ottieni l'istanza di Firebase Auth
-    const auth = getAuth();
-
-    // Effettua il logout
-    await signOut(auth);
-
-    console.log("Logout effettuato con successo!");
-    return { success: true };
-  } catch (error) {
-    console.error("Errore durante il logout:", error.message);
-    return { success: false, error: error.message };
-  }
+  const {logout} = useAuth();
+  logout();
 }
 
 export { loginUser, logoutUser };
