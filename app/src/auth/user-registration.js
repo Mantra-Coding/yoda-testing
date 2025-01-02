@@ -96,7 +96,6 @@ export async function registerUser(formData, portfolioProjects) {
       occupazione: formData.occupazione, // Aggiornato per accettare valori specifici come "developer", "web-developer", ecc.
       userType: formData.userType,
       portfolioProjects: portfolioProjects || [],
-      impiego: formData.impiego,
       cv: cvURL, // Salva il nome del file CV
       createdAt: new Date().toISOString(), // Aggiunto per tracciare la data di registrazione
       field: formData.field || "", // Aggiunto per gestire il campo di interesse sia per mentor che mentee
@@ -104,6 +103,7 @@ export async function registerUser(formData, portfolioProjects) {
 
     // Aggiungi proprietà specifiche per i mentor
     if (formData.userType === "mentor") {
+      userData.impiego = formData.impiego,
       userData.availability = formData.availability || 0; // Disponibilità settimanale
       userData.meetingMode = formData.meetingMode || "online"; // Modalità di incontro
     }
