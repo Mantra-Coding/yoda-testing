@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import Header from "@/components/ui/Header";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { getAllMentors } from "@/dao/matchingDAO";
 import { useAuth } from "@/auth/auth-context"; // Importa il contesto Auth
 import { useNavigate } from "react-router-dom"; // Per navigare in altre pagine
 
-export default function MentorGrid(UserField) {
+export default function MentorGrid() {
     const [mentors, setMentors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

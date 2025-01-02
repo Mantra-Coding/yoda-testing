@@ -102,7 +102,7 @@ export function MentorSearchForm() {
       }
     } catch (err) {
       console.error(err);
-      setError("Errore durante la ricerca.");
+      setError("Devi selezionare un campo di interesse per avviare la ricerca.");
     } finally {
       setLoading(false);
     }
