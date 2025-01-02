@@ -249,12 +249,14 @@ export function MentorSearchForm() {
                 Area Inclusione Femminile
               </Button>
 
-              {/* Risultati */}
-              {loading && <p>Caricamento...</p>}
-              {error && <p className="text-red-600">{error}</p>}
-              {mentors && mentors.length > 0 && (
+{/* Risultati */}
+{loading && <p>Caricamento...</p>}
+{error && <p className="text-red-600">{error}</p>}
+{mentors && mentors.length > 0 && (
   <div className="mt-8">
-    <h3 className="text-2xl font-bold text-emerald-700 text-center mb-6">Mentori Disponibili</h3>
+    <h3 className="text-2xl font-bold text-emerald-700 text-center mb-6">
+      Mentori Disponibili
+    </h3>
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-center items-center">
       {mentors.map((mentor, index) => (
         <div
@@ -264,16 +266,16 @@ export function MentorSearchForm() {
           <div className="flex flex-col items-center">
             <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-4 shadow-inner">
               <img
-                src={`https://avatars.dicebear.com/api/initials/${mentor.name || "Mentore"}.svg`}
+                src={`https://avatars.dicebear.com/api/initials/${mentor.nome || "Mentore"}.svg`}
                 alt="Avatar"
                 className="w-full h-full rounded-full"
               />
             </div>
             <h4 className="text-xl font-bold text-emerald-700 mb-2">
-              {mentor.name || "Nome non disponibile"}
+              {mentor.nome || "Nome non disponibile"} {mentor.cognome || ""}
             </h4>
             <p className="text-sm text-gray-600 italic">
-              {mentor.occupation || "Occupazione non specificata"}
+              {mentor.occupazione || "Occupazione non specificata"}
             </p>
           </div>
           <div className="mt-4 space-y-2 text-center">
@@ -296,7 +298,7 @@ export function MentorSearchForm() {
           </div>
           <div className="mt-6">
             <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-md font-semibold">
-              Contatta {mentor.name?.split(" ")[0] || "Mentore"}
+              Contatta {mentor.nome?.split(" ")[0] || "Mentore"}
             </button>
           </div>
         </div>
@@ -304,6 +306,9 @@ export function MentorSearchForm() {
     </div>
   </div>
 )}
+
+             
+
 
 
              
