@@ -2,12 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-/*  --| Contesto per gestione dei parametri 
-        --\ userId
-        --\ userType
-        --\ nome
-        --\ isLogged
- */
 // Creazione del contesto di autenticazione
 const AuthContext = createContext();
 
@@ -22,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [userType, setUserType] = useState(null);
   const [isLogged, setIsLogged] = useState(false);
   const [nome, setNome] = useState(null);
+  const [field, setField] = useState(null); // Aggiunto il campo `field`
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,15 +33,17 @@ export const AuthProvider = ({ children }) => {
           setUserType(userData.userType);
           setIsLogged(true);
           setNome(userData.nome);
+          setField(userData.field); // Aggiorna il valore di `field`
 
           // Persisti i dati nel localStorage
           localStorage.setItem(
             "auth",
             JSON.stringify({
               userId: user.uid,
-              name: user.nome,
+              nome: userData.nome,
               userType: userData.userType,
               isLogged: true,
+              field: userData.field, // Aggiungi il campo `field`
             })
           );
         }
@@ -56,6 +53,7 @@ export const AuthProvider = ({ children }) => {
         setUserType(null);
         setIsLogged(false);
         setNome(null);
+        setField(null); // Resetta anche il campo `field`
         localStorage.removeItem("auth");
       }
       setLoading(false);
@@ -64,12 +62,13 @@ export const AuthProvider = ({ children }) => {
     // Carica i dati dal localStorage all'avvio
     const storedAuth = localStorage.getItem("auth");
     if (storedAuth) {
-      const { userId, userType, isLogged, nome } = JSON.parse(storedAuth);
+      const { userId, userType, isLogged, nome, field } = JSON.parse(storedAuth);
       setUserId(userId);
       setUserType(userType);
       setIsLogged(isLogged);
-      setLoading(false);
       setNome(nome);
+      setField(field); // Recupera il campo `field` dal localStorage
+      setLoading(false);
     }
 
     return () => unsubscribe();
@@ -82,6 +81,7 @@ export const AuthProvider = ({ children }) => {
       setUserType(null);
       setIsLogged(false);
       setNome(null);
+      setField(null); // Resetta anche il campo `field`
       localStorage.removeItem("auth");
     });
   };
@@ -92,6 +92,7 @@ export const AuthProvider = ({ children }) => {
         userId,
         userType,
         nome,
+        field, // Aggiungi il campo `field` al contesto
         isLogged,
         logout,
       }}

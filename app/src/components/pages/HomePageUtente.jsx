@@ -3,10 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/ui/Header";
 import { useAuth } from "@/auth/auth-context";
+import { useNavigate } from "react-router-dom";
+
+
 
 export default function HomePageUtente() {
-  const {userType, nome} = useAuth();
-
+  const { userType, nome } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,9 +42,13 @@ export default function HomePageUtente() {
         {/* Contenuto specifico per Mentee */}
         {userType === "mentee" && (
           <>
-            <Button className="bg-white text-emerald-600 hover:bg-white/90 mb-16">
-              Trova un Mentore
-            </Button>
+         <Button
+  className="bg-white text-emerald-600 hover:bg-white/90 mb-16"
+  onClick={() => navigate("/matchingpage")}
+>
+  Trova un Mentore
+</Button>
+
             <div className="grid md:grid-cols-3 gap-6 mb-16">
               <Card className="p-6 text-center bg-white/95 hover:bg-white transition-colors">
                 <h3 className="font-semibold mb-3">Esperienza Personalizzata</h3>
@@ -60,9 +67,13 @@ export default function HomePageUtente() {
               <h2 className="text-xl font-semibold text-white mb-4">
                 Seleziona Accuratamente i tuoi Mentori.
               </h2>
-              <Button className="bg-emerald-700 text-white hover:bg-emerald-800">
+              <Button
+                className="bg-emerald-700 text-white hover:bg-emerald-800"
+                onClick={() => navigate("/mentorsearch")}
+              >
                 Cerca
               </Button>
+
             </div>
           </>
         )}

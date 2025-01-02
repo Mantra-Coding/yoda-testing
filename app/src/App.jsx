@@ -15,6 +15,8 @@ import {DettagliUtenteWrapper} from './components/pages/DettaglioUtente';
 import { AuthProvider } from './auth/auth-context';
 import PrivateRoutes from './PrivateRoutes';
 import DettaglioProfilo from './components/pages/DettaglioProfilo';
+import MatchingResultPage from './components/pages/MatchingResultPage';
+
 
 function App() {
   const db = app;
@@ -37,6 +39,7 @@ function App() {
           <Route path="/contents" element={<FileHomePage />} />
           <Route path="/videos" element={<Video />} />
           <Route path="/video/:id" element={<DettaglioVideo />} />
+          <Route path="/matchingpage" element={<MatchingResultPage/>} />
         </Route>
         <Route element={<PrivateRoutes roles={["mentor"]}/>}>
           <Route path="/addfile" element={<FileAddDocument />} />
