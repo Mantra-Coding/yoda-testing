@@ -16,6 +16,7 @@ import { AuthProvider } from './auth/auth-context';
 import PrivateRoutes from './PrivateRoutes';
 import DettaglioProfilo from './components/pages/DettaglioProfilo';
 import MatchingResultPage from './components/pages/MatchingResultPage';
+import Chat from './components/pages/chat';
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
             <Route path="/" element={<Home />} /> 
             <Route path="/register" element={<RegistrationPage/>}/>
             <Route path="/login" element={<LoginPage/>}/> 
+
         </Route>
         <Route element={<PrivateRoutes roles={["mentor","mentee"]}/>}>
           <Route path="/dettagli/:userId" element={<DettagliUtenteWrapper/>} />
@@ -40,6 +42,7 @@ function App() {
           <Route path="/videos" element={<Video />} />
           <Route path="/video/:id" element={<DettaglioVideo />} />
           <Route path="/matchingpage" element={<MatchingResultPage/>} />
+          <Route path="/chat" element={<Chat />} />
         </Route>
         <Route element={<PrivateRoutes roles={["mentor"]}/>}>
           <Route path="/addfile" element={<FileAddDocument />} />
