@@ -22,7 +22,6 @@ export async function fetchUsers(currentUserId) {
           cognome: userData.cognome || "",
           email: userData.email || "Email non disponibile",
           occupazione: userData.occupazione || "Occupazione non specificata",
-          imageUrl: "/default-avatar.png", // Immagine di default (modificabile se presente nel database)
         });
       }
     });
