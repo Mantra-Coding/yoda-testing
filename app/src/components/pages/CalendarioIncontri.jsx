@@ -4,7 +4,6 @@ import Header from "@/components/ui/header";
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { fetchMeetingsForMentor, filterDaysWithMeetings, updateMeeting, deleteMeeting } from "@/dao/meetingsDAO"
-import { useParams } from 'react-router-dom';
 import { useAuth } from '@/auth/auth-context';
 
 const CalendarioIncontri = () => {
@@ -13,16 +12,13 @@ const CalendarioIncontri = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [editingMeeting, setEditingMeeting] = useState(null);
-  const { meetingId } = useParams();
   const {userId} = useAuth();
   const fetchMeetings = async () => {
     try {
       const fetchedMeetings = await fetchMeetingsForMentor(userId);
-      console.log('Incontri recuperati:', fetchedMeetings);
       setMeetings(fetchedMeetings);
     } catch (error) {
       alert("Errore durante il recupero degli incontri.");
-      console.error(error);
     }
   };
 
@@ -31,27 +27,22 @@ const CalendarioIncontri = () => {
   };
 
   const handleSaveEdit = async (updatedMeeting) => {
-    console.log("Tentativo di aggiornamento:", updatedMeeting);
     try {
       await updateMeeting(updatedMeeting.id, updatedMeeting);
       setMeetings((prevMeetings) =>
         prevMeetings.map((m) => (m.id === updatedMeeting.id ? updatedMeeting : m))
       );
       setEditingMeeting(null);
-      console.log("Incontro aggiornato con successo.");
     } catch (error) {
-      console.error("Errore:", error);
     }
   };
 
   const handleDelete = async (meetingId) => {
-    console.log("Tentativo di eliminazione incontro con ID:", meetingId);
     try {
       await deleteMeeting(meetingId);
-      console.log("Incontro eliminato con successo.");
       setMeetings((prevMeetings) => prevMeetings.filter((m) => m.id !== meetingId));
     } catch (error) {
-      console.error("Errore:", error);
+      alert("Errore durante ll'eliminazione dell'incontro.");
     }
   };
 

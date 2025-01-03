@@ -8,7 +8,6 @@ import { useAuth } from "@/auth/auth-context";
 export default function Statistics() {
     const [user, setUser] = useState(null);
     const [meetingsCount, setMeetingsCount] = useState(0);
-    const navigate = useNavigate();
     const { userId } = useAuth();
   
     useEffect(() => {
@@ -18,7 +17,7 @@ export default function Statistics() {
           setUser(userData); // Salva i dati dell'utente
           setMeetingsCount(userData.meetingsCount || 0); // Ottieni il meetingsCount (default a 0 se non esiste)
         } catch (error) {
-          console.error("Errore durante il recupero dei dati dell'utente:", error);
+          allert("Errore durante il recupero dei dati dell'utente:");
         }
       };
   
