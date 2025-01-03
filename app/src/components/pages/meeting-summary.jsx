@@ -6,20 +6,15 @@ import { Button } from "@/components/ui/button";
 
 function MeetingSummary() {
   const { meetingid } = useParams(); // Ottiene l'ID del meeting dai parametri dell'URL
-  console.log("ID:" + meetingid)
   const [meeting, setMeeting] = useState(null); // Stato per i dati del meeting
   const [loading, setLoading] = useState(true); // Stato per il caricamento
   const [error, setError] = useState(null); // Stato per eventuali errori
   const [successMessage, setSuccessMessage] = useState(""); // Stato per il messaggio di successo
 
-  const location = useLocation();
-  console.log('Location:', location); // Stampa l'intero URL e il pathname
-
   useEffect(() => {
     const fetchMeeting = async () => {
       try {
         const meetingData = await fetchMeetingDetails(meetingid); // Recupera i dettagli del meeting
-        console.log("ID:" + meetingid)
         setMeeting(meetingData); // Aggiorna lo stato con i dati del meeting
       } catch (err) {
         setError(err.message); // Gestisce eventuali errori
@@ -36,7 +31,7 @@ function MeetingSummary() {
       await updateMeetingMinutes(meetingid, minuta); // Aggiorna le note del meeting
       setSuccessMessage("Informazioni salvate con successo!");
     } catch (err) {
-      console.error("Errore nel salvataggio delle note:", err);
+      aller("Errore nel salvataggio delle note:");
     }
   };
 

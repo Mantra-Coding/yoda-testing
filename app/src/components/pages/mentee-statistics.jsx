@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";  
-import { useNavigate } from "react-router-dom";
 import Header from "@/components/ui/header";
 import { getUserByID } from "@/dao/userDAO"; // Aggiungi l'import delle funzioni DAO
 import { jsPDF } from "jspdf"; // Importa jsPD
@@ -8,7 +7,6 @@ import { useAuth } from "@/auth/auth-context";
 export default function Statistics() {
     const [user, setUser] = useState(null);
     const [meetingsCount, setMeetingsCount] = useState(0);
-    const navigate = useNavigate();
     const { userId } = useAuth();
   
     useEffect(() => {

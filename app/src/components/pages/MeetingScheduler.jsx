@@ -4,7 +4,6 @@ import { getMentees, createMeeting } from "@/dao/meetingsDAO";
 import Header from "@/components/ui/header";
 import { useAuth } from '@/auth/auth-context';
 const MeetingScheduler = () => {
-  const [user, setUser] = useState(null);
   const [mentees, setMentees] = useState([]);
   const [formData, setFormData] = useState({
     date: '',
@@ -23,18 +22,12 @@ const MeetingScheduler = () => {
         const menteesList = await getMentees();
         setMentees(menteesList);
       } catch (error) {
-        console.error('Errore durante il recupero dei mentee:', error);
+        aller('Errore durante il recupero dei mentee:');
       }
     };
   
     fetchMenteesData();
-  
-    // Se non c'è nessun listener da disattivare, rimuovi il return
-    return () => {
-      console.log("Cleanup eseguito, ma non c'è nessun listener da disattivare.");
-    };
   }, []);
-  
   // Funzione per convalidare il form
   const validateForm = () => {
     return (
@@ -66,10 +59,6 @@ const MeetingScheduler = () => {
           alert('Partecipante non trovato');
           return;
         }
-
-        // Log dei dati del partecipante per debug
-        console.log('Dati del partecipante selezionato:', selectedParticipant);
-
         // Verifica che tutti i dati necessari siano disponibili
         if (!selectedParticipant.nome || !selectedParticipant.email) {
           alert('I dati del partecipante sono incompleti');

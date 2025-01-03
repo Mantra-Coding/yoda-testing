@@ -128,12 +128,12 @@ export const updateMeetingMinutes = async (meetingId, minuta) => {
 export const createMeeting = async (meetingData) => {
   try {
     // Verifica che userType sia mentee
-    if (meetingData.userType !== 'mentee') {
-      throw new Error('Il tipo di utente deve essere mentee');
+    if (meetingData.userType !== "mentee") {
+      throw new Error("Il tipo di utente deve essere mentee");
     }
 
-    // Recupera il riferimento al documento del mentee nella collezione utenti
-    const menteeRef = doc(db, 'utenti', meetingData.menteeId);
+    // Recupera il riferimento al documento del mentee
+    const menteeRef = doc(db, "utenti", meetingData.menteeId);
     const menteeSnap = await getDoc(menteeRef);
 
     if (!menteeSnap.exists()) {
@@ -142,12 +142,40 @@ export const createMeeting = async (meetingData) => {
 
     const menteeData = menteeSnap.data();
 
-    // Se il campo meetingsCount esiste, incrementalo, altrimenti crealo e impostalo a 1
-    if (typeof menteeData.meetingsCount === 'number') {
-      // Incrementa meetingsCount
+    // Converte la data in Timestamp Firestore
+    const meetingDate = meetingData.date instanceof Timestamp
+      ? meetingData.date
+      : Timestamp.fromDate(new Date(meetingData.date));
+
+    // Converte l'orario in minuti totali
+    const [hours, minutes] = meetingData.time.split(":").map(Number);
+    const meetingMinutes = hours * 60 + minutes;
+
+    // Query per trovare incontri nello stesso giorno con lo stesso mentor
+    const meetingsRef = collection(db, "meetings");
+    const existingMeetingsQuery = query(
+      meetingsRef,
+      where("mentorId", "==", meetingData.mentorId),
+      where("date", "==", meetingDate)
+    );
+
+    const existingMeetingsSnapshot = await getDocs(existingMeetingsQuery);
+
+    for (const doc of existingMeetingsSnapshot.docs) {
+      const existingMeeting = doc.data();
+      const [existingHours, existingMinutes] = existingMeeting.time.split(":").map(Number);
+      const existingMeetingMinutes = existingHours * 60 + existingMinutes;
+
+      // Controllo intervallo di 10 minuti
+      if (Math.abs(meetingMinutes - existingMeetingMinutes) < 10) {
+        throw new Error("Non è possibile schedulare un meeting a meno di 10 minuti di distanza da un altro.");
+      }
+    }
+
+    // Aggiorna il contatore di meeting del mentee
+    if (typeof menteeData.meetingsCount === "number") {
       await updateDoc(menteeRef, { meetingsCount: increment(1) });
     } else {
-      // Crea meetingsCount e imposta a 1
       await updateDoc(menteeRef, { meetingsCount: 1 });
     }
 
@@ -156,22 +184,24 @@ export const createMeeting = async (meetingData) => {
       mentorId: meetingData.mentorId,
       menteeId: meetingData.menteeId,
       mentorName: meetingData.mentorName,
-      mentorSurname : meetingData.mentorSurname,
-      date: meetingData.date,
+      mentorSurname: meetingData.mentorSurname,
+      date: meetingDate,
       time: meetingData.time,
       topic: meetingData.topic,
       description: meetingData.description,
       menteeName: meetingData.menteeName,
       menteeEmail: meetingData.menteeEmail,
-      minuta: null,  // Il campo MINUTA inizialmente è null
+      minuta: null,
     };
 
-    // Aggiungi il nuovo incontro al database
-    const docRef = await addDoc(collection(db, 'meetings'), newMeeting);
-    await createNotificationMeeting(newMeeting.mentorId,newMeeting.menteeId, newMeeting.mentorName, newMeeting.mentorSurname);
-    return docRef.id; // Restituisce l'ID del documento appena creato
+    // Aggiungi il nuovo meeting al database
+    const docRef = await addDoc(collection(db, "meetings"), newMeeting);
+
+    // Crea la notifica per il meeting
+    await createNotificationMeeting(newMeeting.mentorId, newMeeting.menteeId, newMeeting.mentorName, newMeeting.mentorSurname);
+
+    return docRef.id;
   } catch (error) {
-    console.error('Errore durante la creazione dell\'incontro:', error);
     throw error;
   }
 };

@@ -14,11 +14,9 @@ const CalendarioIncontri = () => {
     try {
       // Recuperiamo i meeting per il mentee
       const fetchedMeetings = await fetchMeetingsForMentee(userId);
-      console.log("Dati recuperati:", fetchedMeetings); // 👀 Debug
       setMeetings(fetchedMeetings);
     } catch (error) {
       alert("Errore durante il recupero degli incontri.");
-      console.error(error);
     }
   };
 
