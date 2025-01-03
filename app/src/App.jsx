@@ -23,6 +23,7 @@ import MeetingSummaryMentee from './components/pages/meeting-summaryformentee';
 import Menteestatistics from './components/pages/mentee-statistics';
 import CalendarioIncontriMentee from './components/pages/CalendarioIncontriMentee';
 import NotificationsPage from "@/components/pages/Notifica";
+import MentorshipPage from './components/pages/MentorshipPage';
 
 function App() {
   const db = app;
@@ -37,6 +38,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
           </Route>
           <Route element={<PrivateRoutes roles={["mentor", "mentee"]} />}>
+            <Route path="/personal-area" element={<MentorshipPage />} />
             <Route path="/dettagli/:userId" element={<DettagliUtenteWrapper />} />
             <Route path="/HomePageUtente" element={<HomePageUtente />} />
             <Route path="/profile" element={<DettaglioProfilo />} />

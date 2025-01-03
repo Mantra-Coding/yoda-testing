@@ -29,11 +29,16 @@ function DettagliUtente({ user }) {
   const { userId } = useAuth();
   const isMentor = user.userType === "mentor";
   const ownPage = userId === user.id;
+  const [successMessage, setSuccessMessage] = useState(""); // Stato per il messaggio di successo
 
+  
   // Funzione che gestisce la richiesta di mentorship
 async function handleRichiestaMentorship(user) {
   try {
     createNotificationMentorship(userId, user.id, user.nome, user.cognome);
+    setSuccessMessage("Notifica inviata con successo!");
+    setTimeout(() => setSuccessMessage(""), 3000); // Nasconde il messaggio dopo 3 secondi
+
   }
   catch (error){
     console.log("notifica mentorship non inviata con successo");
@@ -198,6 +203,15 @@ async function handleRichiestaMentorship(user) {
                 </div>
               </div>
             )}
+
+            
+             {/* Messaggio di successo */}
+             {successMessage && (
+              <div className="mt-4 p-2 bg-green-100 text-green-700 rounded-md text-center">
+                {successMessage}
+              </div>
+            )}
+
 
             {/* Azione finale */}
             <div className="mt-6 flex justify-end">

@@ -1,5 +1,6 @@
-import { getDocs, getDoc, collection, doc, addDoc } from "firebase/firestore";
+
 import { db } from "@/firebase/firebase";
+import { getDocs, getDoc, collection, doc, addDoc } from "firebase/firestore";
 
 const mentorshipSessionCollectionRef = collection(db, 'mentorship_session');
 
@@ -10,6 +11,29 @@ const mentorshipSessionCollectionRef = collection(db, 'mentorship_session');
  * @returns {Promise<object>} I dati della sessione di mentorship.
  * @throws {Error} Se la sessione di mentorship non esiste.
  */
+
+
+
+export async function fetchMentorship(userId) {
+    try {
+        const mentorshipSnapshot = await getDocs(mentorshipSessionCollectionRef);
+        const sessions = mentorshipSnapshot.docs
+            .map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }))
+            .filter(session => session.mentore === userId || session.mentee === userId); // Filtra per ID utente
+        
+        console.log("Sessioni di mentorship trovate:", sessions);
+        return sessions;
+    } catch (error) {
+        console.error("Errore nel recupero delle sessioni mentorship:", error);
+        throw error;
+    }
+}
+
+
+
 export async function getById(mentorshipId) {
     try {
         const docRef = doc(mentorshipSessionCollectionRef, mentorshipId);
