@@ -1,5 +1,12 @@
 import { getFirestore, setDoc, doc, getDoc } from "firebase/firestore";
 import { app } from "@/Firebase/firebase"; // Importa la configurazione Firebase
+import bcrypt from "bcryptjs";
+
+// Funzione per cifrare una password
+async function hashPassword(password) {
+    const salt = await bcrypt.genSalt(10);
+    return bcrypt.hash(password, salt);
+}
 
 // Ottieni Firestore
 const db = getFirestore(app);
@@ -33,6 +40,7 @@ async function populateDatabase() {
                     cv: null,
                     dataNascita: "1985-07-10",
                     email: "rossi.ml@gmail.com",
+                    password: await hashPassword("000000"), 
                     field: null,
                     meetingMode: "online",
                     nome: "Mario",
@@ -53,6 +61,7 @@ async function populateDatabase() {
                     cv: "cv_bianchi.pdf",
                     dataNascita: "1990-03-12",
                     email: "bianchi.ds@gmail.com",
+                    password: await hashPassword("000000"), 
                     field: null,
                     meetingMode: "in-person",
                     nome: "Luigi",
@@ -73,6 +82,7 @@ async function populateDatabase() {
                     cv: "cv_verdi.pdf",
                     dataNascita: "1980-01-25",
                     email: "verdi.ai@gmail.com",
+                    password: await hashPassword("000000"), 
                     field: null,
                     meetingMode: "hybrid",
                     nome: "Giovanni",
@@ -93,6 +103,7 @@ async function populateDatabase() {
                     cv: "cv_gialli.pdf",
                     dataNascita: "1982-08-19",
                     email: "gialli.cc@gmail.com",
+                    password: await hashPassword("000000"), 
                     field: null,
                     meetingMode: "online",
                     nome: "Alessandro",
@@ -113,6 +124,7 @@ async function populateDatabase() {
                     cv: "cv_neri.pdf",
                     dataNascita: "1995-06-05",
                     email: "neri.bc@gmail.com",
+                    password: await hashPassword("000000"), 
                     field: null,
                     meetingMode: "online",
                     nome: "Francesco",
@@ -136,6 +148,7 @@ async function populateDatabase() {
                     cv: "cv_bruni.pdf",
                     dataNascita: "1998-08-14",
                     email: "bruni.js@gmail.com",
+                    password: await hashPassword("000000"), 
                     field: "web-development",
                     nome: "Giorgio",
                     occupazione: null,
@@ -155,6 +168,7 @@ async function populateDatabase() {
                     cv: "cv_luca.pdf",
                     dataNascita: "2000-05-20",
                     email: "luca.py@gmail.com",
+                    password: await hashPassword("000000"), 
                     field: "data-science",
                     nome: "Matteo",
                     occupazione: "Junior Data Analyst",
@@ -174,6 +188,7 @@ async function populateDatabase() {
                     cv: "cv_verdi.pdf",
                     dataNascita: "1999-03-30",
                     email: "verdi.web@gmail.com",
+                    password: await hashPassword("000000"), 
                     field: "front-end",
                     nome: "Luca",
                     occupazione: null,
@@ -193,6 +208,7 @@ async function populateDatabase() {
                     cv: "cv_alti.pdf",
                     dataNascita: "1997-11-12",
                     email: "alti.java@gmail.com",
+                    password: await hashPassword("000000"), 
                     field: "software-engineering",
                     nome: "Marco",
                     occupazione: null,
@@ -212,6 +228,7 @@ async function populateDatabase() {
                     cv: "cv_rossi.pdf",
                     dataNascita: "2001-07-09",
                     email: "rossi.cs@gmail.com",
+                    password: await hashPassword("000000"), 
                     field: "backend-development",
                     nome: "Giovanni",
                     occupazione: "Junior Developer",
@@ -230,90 +247,90 @@ async function populateDatabase() {
                 id: "video1",
                 data: {
                     description: "Introduzione al Machine Learning",
-                    thumbnail: "http://example.com/thumbnail1.png",
+                    thumbnail: "https://img.youtube.com/vi/WTt51-5K3L8/0.jpg", // Miniatura del video
                     title: "Machine Learning Basics",
-                    videoUrl: "http://localhost:9199/v0/b/yoda/videos/video1.mp4",
+                    videoUrl: "https://www.youtube.com/embed/WTt51-5K3L8?si=VNejAyWw1XD4Jh29",
                 },
             },
             {
                 id: "video2",
                 data: {
                     description: "Introduzione alla Data Science",
-                    thumbnail: "http://example.com/thumbnail2.png",
+                    thumbnail: "https://img.youtube.com/vi/aeXnS26fy7E/0.jpg",
                     title: "Data Science Fundamentals",
-                    videoUrl: "http://localhost:9199/v0/b/yoda/videos/video2.mp4",
+                    videoUrl: "https://www.youtube.com/embed/aeXnS26fy7E?si=gSessn85myHNyGAl",
                 },
             },
             {
                 id: "video3",
                 data: {
                     description: "Guida al Cloud Computing",
-                    thumbnail: "http://example.com/thumbnail3.png",
+                    thumbnail: "https://img.youtube.com/vi/da3NOtH3PXM/0.jpg",
                     title: "Cloud Computing Essentials",
-                    videoUrl: "http://localhost:9199/v0/b/yoda/videos/video3.mp4",
+                    videoUrl: "https://www.youtube.com/embed/da3NOtH3PXM?si=HvV7sB2Ysc6j5tpq", 
                 },
             },
             {
                 id: "video4",
                 data: {
                     description: "Blockchain e il Futuro della Tecnologia",
-                    thumbnail: "http://example.com/thumbnail4.png",
+                    thumbnail: "https://img.youtube.com/vi/cywucO-jxNw/0.jpg", 
                     title: "Blockchain Overview",
-                    videoUrl: "http://localhost:9199/v0/b/yoda/videos/video4.mp4",
+                    videoUrl: "https://www.youtube.com/embed/cywucO-jxNw?si=KhCp7x3waMo5_80K", 
                 },
             },
             {
                 id: "video5",
                 data: {
-                    description: "Sviluppare Applicazioni Web Moderne",
-                    thumbnail: "http://example.com/thumbnail5.png",
+                    description: "Introduzione allo sviluppo Applicazioni Web Moderne",
+                    thumbnail: "https://img.youtube.com/vi/aVnKGkaoOQ8/0.jpg",
                     title: "Web Development Trends",
-                    videoUrl: "http://localhost:9199/v0/b/yoda/videos/video5.mp4",
+                    videoUrl: "https://www.youtube.com/embed/aVnKGkaoOQ8?si=urRqltS14KApJaZK",
                 },
             },
             {
             id: "video6",
             data: {
                 description: "Guida all'intelligenza artificiale per principianti",
-                thumbnail: "http://example.com/thumbnail6.png",
+                thumbnail: "default-thumbnail-url",
                 title: "AI for Beginners",
-                videoUrl: "http://localhost:9199/v0/b/yoda/videos/video6.mp4",
+                videoUrl: "http://localhost:9199/v0/b/yoda/videos/Video6- Intelligenza Artificiale.mp4",
             },
         },
         {
             id: "video7",
             data: {
                 description: "Introduzione alla programmazione in Python",
-                thumbnail: "http://example.com/thumbnail7.png",
+                thumbnail: "default-thumbnail-url",
                 title: "Python Programming Basics",
-                videoUrl: "http://localhost:9199/v0/b/yoda/videos/video7.mp4",
+                videoUrl: "http://localhost:9199/v0/b/yoda/videos/Video7- Phyton.mp4",
             },
         },
         {
             id: "video8",
             data: {
                 description: "Corso completo su Data Science con Python",
-                thumbnail: "http://example.com/thumbnail8.png",
+                thumbnail: "default-thumbnail-url",
                 title: "Data Science with Python",
-                videoUrl: "http://localhost:9199/v0/b/yoda/videos/video8.mp4",
+                videoUrl: "http://localhost:9199/v0/b/yoda/videos/Video8- DataScience.mp4",
             },
         },
         {
             id: "video9",
             data: {
                 description: "Come sviluppare applicazioni con React",
-                thumbnail: "http://example.com/thumbnail9.png",
+                thumbnail: "default-thumbnail-url",
                 title: "React for Developers",
-                videoUrl: "http://localhost:9199/v0/b/yoda/videos/video9.mp4",
+                videoUrl: "http://localhost:9199/v0/b/yoda/videos/Video9- React.mp4",
             },
         },
         {
             id: "video10",
             data: {
                 description: "Fondamenti di Cloud Computing con AWS",
-                thumbnail: "http://example.com/thumbnail10.png",
+                thumbnail: "default-thumbnail-url",
                 title: "Cloud Computing Essentials with AWS",
-                videoUrl: "http://localhost:9199/v0/b/yoda/videos/video10.mp4",
+                videoUrl: "http://localhost:9199/v0/b/yoda/videos/Video10- Cloud Computing.mp4",
             },
         }
         ];
@@ -325,7 +342,7 @@ async function populateDatabase() {
                 data: {
                     email: "author1@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/documents/doc1.pdf",
+                    filePath: "http://localhost:9199/Documents/Documents1.pdf",
                     icon: "📄",
                     role: "Researcher",
                     title: "AI and Ethics",
@@ -337,7 +354,7 @@ async function populateDatabase() {
                 data: {
                     email: "author2@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/documents/doc2.pdf",
+                    filePath: "http://localhost:9199/Documents/Documents2.pdf",
                     icon: "📄",
                     role: "Engineer",
                     title: "Cloud Architecture",
@@ -349,7 +366,7 @@ async function populateDatabase() {
                 data: {
                     email: "author3@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/documents/doc3.pdf",
+                    filePath: "http://localhost:9199/Documents/Documents3.pdf",
                     icon: "📄",
                     role: "Scientist",
                     title: "Blockchain for Future",
@@ -361,7 +378,7 @@ async function populateDatabase() {
                 data: {
                     email: "author4@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/documents/doc4.pdf",
+                    filePath: "http://localhost:9199/Documents/Documents4.pdf",
                     icon: "📄",
                     role: "Developer",
                     title: "Web Development Practices",
@@ -373,7 +390,7 @@ async function populateDatabase() {
                 data: {
                     email: "author5@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/documents/doc5.pdf",
+                    filePath: "http://localhost:9199/Documents/Documents5.pdf",
                     icon: "📄",
                     role: "Technologist",
                     title: "Understanding AI",
@@ -385,7 +402,7 @@ async function populateDatabase() {
                 data: {
                     email: "author6@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/documents/doc6.pdf",
+                    filePath: "http://localhost:9199/Documents/Documents6.pdf",
                     icon: "📄",
                     role: "Software Engineer",
                     title: "Building Scalable Web Apps",
@@ -397,7 +414,7 @@ async function populateDatabase() {
                 data: {
                     email: "author7@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/documents/doc7.pdf",
+                    filePath: "http://localhost:9199/Documents/Documents7.pdf",
                     icon: "📄",
                     role: "Data Scientist",
                     title: "Predictive Modeling with Python",
@@ -409,7 +426,7 @@ async function populateDatabase() {
                 data: {
                     email: "author8@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/documents/doc8.pdf",
+                    filePath: "http://localhost:9199/Documents/Documents8.pdf",
                     icon: "📄",
                     role: "Cloud Architect",
                     title: "Designing Cloud Systems",
@@ -421,7 +438,7 @@ async function populateDatabase() {
                 data: {
                     email: "author9@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/documents/doc9.pdf",
+                    filePath: "http://localhost:9199/Documents/Documents9.pdf",
                     icon: "📄",
                     role: "Blockchain Developer",
                     title: "Blockchain Development",
@@ -433,7 +450,7 @@ async function populateDatabase() {
                 data: {
                     email: "author10@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/documents/doc10.pdf",
+                    filePath: "http://localhost:9199/Documents/Documents10.pdf",
                     icon: "📄",
                     role: "AI Specialist",
                     title: "Ethics in Artificial Intelligence",
@@ -567,9 +584,9 @@ async function populateDatabase() {
 
         // Inserimento dati
         const collections = [
-            { name: "users", items: [...mentors, ...mentees] },
+            { name: "utenti", items: [...mentors, ...mentees] },
             { name: "videos", items: videos },
-            { name: "authors", items: authors },
+            { name: "documents", items: authors },
             { name: "meetings", items: meetings },
             { name: "notifiche", items: notifiche },
         ];
