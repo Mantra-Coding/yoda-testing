@@ -15,6 +15,7 @@ const MeetingScheduler = () => {
   });
   const {userId} = useAuth();
   const {nome} = useAuth();
+  const {cognome} = useAuth();
   // Controllo se l'utente è un mentor e recupero i partecipanti (mentees)
   useEffect(() => {
     const fetchMenteesData = async () => {
@@ -86,6 +87,7 @@ const MeetingScheduler = () => {
           description: formData.description,
           mentorId: userId,  // Assicurati che `user.uid` sia definito
           mentorName: nome,
+          mentorSurname: cognome,
           menteeId: selectedParticipant.id, // Questo dovrebbe essere l'ID del mentee
           menteeName: selectedParticipant.nome, // Usa 'nome' invece di 'name'
           menteeEmail: selectedParticipant.email,

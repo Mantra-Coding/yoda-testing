@@ -14,7 +14,7 @@ const CalendarioIncontri = () => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [editingMeeting, setEditingMeeting] = useState(null);
   const { meetingId } = useParams();
-  const {userId} = useAuth();
+  const {userId,nome,cognome} = useAuth();
   const fetchMeetings = async () => {
     try {
       const fetchedMeetings = await fetchMeetingsForMentor(userId);
@@ -30,10 +30,10 @@ const CalendarioIncontri = () => {
     setEditingMeeting(meeting);
   };
 
-  const handleSaveEdit = async (updatedMeeting) => {
+  const handleSaveEdit = async (meeting,updatedMeeting) => {
     console.log("Tentativo di aggiornamento:", updatedMeeting);
     try {
-      await updateMeeting(updatedMeeting.id, updatedMeeting);
+      await updateMeeting(updatedMeeting.id,meeting.menteeId,userId,nome,cognome);
       setMeetings((prevMeetings) =>
         prevMeetings.map((m) => (m.id === updatedMeeting.id ? updatedMeeting : m))
       );
@@ -44,10 +44,10 @@ const CalendarioIncontri = () => {
     }
   };
 
-  const handleDelete = async (meetingId) => {
+  const handleDelete = async (meetingId,menteeId) => {
     console.log("Tentativo di eliminazione incontro con ID:", meetingId);
     try {
-      await deleteMeeting(meetingId);
+      await deleteMeeting(meetingId,menteeId,userId,nome,cognome);
       console.log("Incontro eliminato con successo.");
       setMeetings((prevMeetings) => prevMeetings.filter((m) => m.id !== meetingId));
     } catch (error) {
@@ -262,7 +262,7 @@ const CalendarioIncontri = () => {
                     Modifica
                   </Button>
                   <Button
-                    onClick={() => handleDelete(meeting.id)}
+                    onClick={() => handleDelete(meeting.id,meeting.menteeId)}
                     style={{
                       backgroundColor: '#EF4444',
                       color: 'white',
@@ -346,7 +346,7 @@ const CalendarioIncontri = () => {
                   description: e.target.description.value,
                   topic: e.target.topic.value,
                 };
-                handleSaveEdit(updatedMeeting);
+                handleSaveEdit(editingMeeting,updatedMeeting);
               }}
             >
               <div style={{ marginBottom: '8px' }}>

@@ -8,7 +8,7 @@ import { getUserByID } from '@/dao/userDAO';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/auth/auth-context';
-
+import { createNotificationMentorship } from '@/dao/notificaDAO';
 
 /* 
     Componente DettagliUtente
@@ -24,17 +24,37 @@ import { useAuth } from '@/auth/auth-context';
     - user: Oggetto con i dettagli dell'utente.
 */
 
+// Funzione che gestisce la richiesta di mentorship
+async function handleRichiestaMentorship() {
+  try {
+    // 1. Recupera l'ID dell'utente corrente
+    const currentUserId = await getCurrentUserUID();
 
+    // 2. Ottieni i dettagli dell'utente corrente (nome e cognome)
+    const currentUserData = await getUserByID(currentUserId);
+    const currentUserName = currentUserData.nome;
+    const currentUserSurname = currentUserData.cognome;
+
+    createNotificationMentorship(currentUserId, user.id, currentUserName, currentUserSurname);
+
+  }
+  catch {
+    console.log("notifica mentorship non inviata con successo");
+
+  }
+}
 function DettagliUtente({ user }) {
   const isMentor = user.userType === "mentor";
-  const {userId} = useAuth();
+  const { userId } = useAuth();
   const ownPage = userId === user.id;
   function handleClick() {
     if (ownPage) {
-      window.location.href="/edit-profile";return;}
-    if (isMentor) console.log ("[DettaglioUtente] Richiedi mentorship");
+      window.location.href = "/edit-profile"; return;
+    }
+    if (isMentor) handleRichiestaMentorship();
     else console.log("[DettaglioUtente] RichiedoContatto")
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#178563] to-white text-black">
       <Header />
@@ -186,11 +206,11 @@ function DettagliUtente({ user }) {
 
             {/* Azione finale */}
             <div className="mt-6 flex justify-end">
-              <Button className="bg-[#178563] text-white hover:bg-[#178563]/90" onClick={()=>handleClick()}>
-                {ownPage 
-                  ? "Modifica Profilo" 
-                  : isMentor 
-                    ? "Richiedi Mentorship" 
+              <Button className="bg-[#178563] text-white hover:bg-[#178563]/90" onClick={() => handleClick()}>
+                {ownPage
+                  ? "Modifica Profilo"
+                  : isMentor
+                    ? "Richiedi Mentorship"
                     : "Contatta il Mentee"}
               </Button>
             </div>
@@ -202,13 +222,13 @@ function DettagliUtente({ user }) {
 }
 
 
-  /* 
-    Componente DettagliUtenteWrapper
-    ---------------------------------
-    - Recupera l'ID dell'utente dai parametri URL.
-    - Recupera i dati dell'utente dal backend utilizzando `getUserByID`.
-    - Gestisce stati di caricamento ed errori.
-    - Passa i dati utente al componente `DettagliUtente`.
+/* 
+  Componente DettagliUtenteWrapper
+  ---------------------------------
+  - Recupera l'ID dell'utente dai parametri URL.
+  - Recupera i dati dell'utente dal backend utilizzando `getUserByID`.
+  - Gestisce stati di caricamento ed errori.
+  - Passa i dati utente al componente `DettagliUtente`.
 */
 
 
@@ -232,7 +252,8 @@ function DettagliUtenteWrapper() {
       }
     };
 
-    if (userId) fetchUser(userId)}, [userId]);
+    if (userId) fetchUser(userId)
+  }, [userId]);
 
   if (loading) {
     return <div>Caricamento...</div>;
@@ -250,4 +271,4 @@ function DettagliUtenteWrapper() {
 }
 
 
-export { DettagliUtente, DettagliUtenteWrapper};
+export { DettagliUtente, DettagliUtenteWrapper };

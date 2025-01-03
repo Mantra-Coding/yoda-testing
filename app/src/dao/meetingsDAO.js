@@ -1,6 +1,6 @@
 import { db } from "@/firebase/firebase";
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc, deleteDoc, addDoc , getDoc , increment} from 'firebase/firestore';
-
+import {createNotificationMeeting, updateNotificationMeeting, removeNotificationMeeting} from "@/dao/notificaDAO";
 /**
  * Recupera tutti gli incontri di un mentor dal database.
  * @param {string} mentorId - ID del mentor autenticato.
@@ -21,6 +21,7 @@ export const fetchMeetingsForMentor = async (mentorId) => {
       return {
         id: doc.id,
         menteeName: data.menteeName,
+        menteeId: data.menteeId,
         date: data.date.toDate(),
         time: data.time,
         description: data.description,
@@ -155,6 +156,7 @@ export const createMeeting = async (meetingData) => {
       mentorId: meetingData.mentorId,
       menteeId: meetingData.menteeId,
       mentorName: meetingData.mentorName,
+      mentorSurname : meetingData.mentorSurname,
       date: meetingData.date,
       time: meetingData.time,
       topic: meetingData.topic,
@@ -166,6 +168,7 @@ export const createMeeting = async (meetingData) => {
 
     // Aggiungi il nuovo incontro al database
     const docRef = await addDoc(collection(db, 'meetings'), newMeeting);
+    await createNotificationMeeting(newMeeting.mentorId,newMeeting.menteeId, newMeeting.mentorName, newMeeting.mentorSurname);
     return docRef.id; // Restituisce l'ID del documento appena creato
   } catch (error) {
     console.error('Errore durante la creazione dell\'incontro:', error);
@@ -179,10 +182,11 @@ export const createMeeting = async (meetingData) => {
  * @param {Object} updatedData - I dati da aggiornare.
  * @returns {Promise<void>}
  */
-export const updateMeeting = async (meetingId, updatedData) => {
+export const updateMeeting = async (meetingId, menteeId, mittenteId,nome,cognome) => {
   try {
     const meetingRef = doc(db, 'meetings', meetingId);
     await updateDoc(meetingRef, updatedData);
+    await updateNotificationMeeting(mittenteId,menteeId,nome,cognome);
   } catch (error) {
     console.error('Errore durante la modifica dell\'incontro:', error);
     throw error;
@@ -194,10 +198,11 @@ export const updateMeeting = async (meetingId, updatedData) => {
  * @param {string} meetingId - ID dell'incontro da eliminare.
  * @returns {Promise<void>}
  */
-export const deleteMeeting = async (meetingId) => {
+export const deleteMeeting = async (meetingId,menteeId,userId,nome,cognome) => {
   try {
     const meetingRef = doc(db, 'meetings', meetingId);
     await deleteDoc(meetingRef);
+    await removeNotificationMeeting(userId,menteeId,nome, cognome);
   } catch (error) {
     console.error('Errore durante l\'eliminazione dell\'incontro:', error);
     throw error;
