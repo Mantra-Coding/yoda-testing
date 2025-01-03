@@ -4,6 +4,7 @@ import { getAllMentors } from "@/dao/supportoDAO"; // Importa la funzione dal DA
 import { Card, CardContent } from "@/components/ui/card"; // Importa i componenti per le cards
 import { Button } from "@/components/ui/button"; // Importa il componente Button
 import { Phone, Mail } from "lucide-react"; // Importa le icone
+import { useNavigate } from "react-router-dom"; 
 
 // Importazione dei componenti Select
 import {
@@ -17,7 +18,9 @@ import {
 export default function SupportPage() {
   const [mentors, setMentors] = useState([]); // Stato per memorizzare i mentori
   const [loading, setLoading] = useState(true); // Stato per la gestione del caricamento
-
+  const navigate = useNavigate(); // Inizializza useNavigate
+  const [selectedProblem, setSelectedProblem] = useState(""); // Stato per il problema selezionato
+  
   useEffect(() => {
     const loadMentors = async () => {
       const result = await getAllMentors(); // Chiama il DAO per ottenere i mentori
@@ -62,7 +65,7 @@ export default function SupportPage() {
       <div className="mx-auto max-w-6xl space-y-8 p-6">
         <div className="space-y-4">
           <h1 className="text-2xl font-bold text-white">Richiedi Supporto</h1>
-          <Select>
+          <Select onValueChange={(value) => setSelectedProblem(value)}>
             <SelectTrigger className="w-full bg-white">
               <SelectValue placeholder="Seleziona un tipo di problema" />
             </SelectTrigger>
@@ -74,20 +77,24 @@ export default function SupportPage() {
             </SelectContent>
           </Select>
         </div>
-
+  
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-white">Mentori Disponibili</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {mentors.map((mentor) => (
               <Card key={mentor.id} className="bg-white">
                 <CardContent className="p-4">
-                  <h3 className="font-semibold">{mentor.nome} {mentor.cognome}</h3>
+                  <h3 className="font-semibold">
+                    {mentor.nome} {mentor.cognome}
+                  </h3>
                   <p className="text-sm text-gray-500">Occupazione: {mentor.occupazione}</p>
                   <p className="text-sm text-gray-500">Competenze:</p>
                   <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-gray-600">
-                    {(mentor.competenze.split(",") || [mentor.competenze]).map((competenza, index) => (
-                      <li key={index}>{competenza.trim()}</li>
-                    ))}
+                    {(mentor.competenze.split(",") || [mentor.competenze]).map(
+                      (competenza, index) => (
+                        <li key={index}>{competenza.trim()}</li>
+                      )
+                    )}
                   </ul>
                   <Button
                     className="w-full bg-emerald-600 hover:bg-emerald-700"
@@ -98,11 +105,12 @@ export default function SupportPage() {
                     Visualizza Mentore
                   </Button>
                   <Button
-                    className="w-full mt-2 bg-blue-600 hover:bg-blue-700"
-                    onClick={() => {
-                      window.location.href = `/chat-support/${mentor.id}`; // Redirect alla pagina chat
-                    }}
-                  >
+                className="w-full mt-2 bg-blue-600 hover:bg-blue-700"
+                onClick={() => {
+                  navigate(`/chat-support/${mentor.id}?problemType=${selectedProblem}`); // Passa il tipo di supporto come query parameter
+                }}
+                disabled={!selectedProblem} // Disabilita se nessun problema è selezionato
+              >
                     Contatta Mentore
                   </Button>
                 </CardContent>

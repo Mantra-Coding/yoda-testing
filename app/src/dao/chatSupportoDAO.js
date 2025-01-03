@@ -1,36 +1,37 @@
-import { db } from "@/lib/firebase"; // Assicurati di avere l'istanza di Firebase configurata correttamente
-import { collection, addDoc, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import { getFirestore, collection, where, query, getDocs, addDoc, orderBy } from "firebase/firestore";
+import app from "@/firebase/firebase";
 
-// Funzione per inviare un messaggio
-export const sendMessage = async (mentorId, userId, message) => {
+const db = getFirestore(app);
+const supportCollection = collection(db, "supportChat");
+
+// Recupera i messaggi dalla chat di supporto
+export async function getSupportMessages(mentorId) {
   try {
-    const messagesRef = collection(db, "chat", mentorId, "messages");
-    await addDoc(messagesRef, {
-      userId: userId,
-      message: message,
-      timestamp: new Date(),
-    });
-    console.log("Messaggio inviato con successo!");
-  } catch (error) {
-    console.error("Errore nell'invio del messaggio: ", error);
+    const messagesQuery = query(
+      collection(db, "supportChat"),
+      where("chatId", "==", mentorId), // Filtra per chatId uguale a mentorId
+      orderBy("timestamp", "asc")     // Ordina per timestamp
+    );
+
+    const messagesSnapshot = await getDocs(messagesQuery);
+    const messages = messagesSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return messages; // Ritorna i messaggi recuperati
+  } catch (err) {
+    console.error("Errore durante il recupero dei messaggi:", err);
+    throw new Error("Impossibile recuperare i messaggi.");
   }
-};
-
-// Funzione per ottenere i messaggi in tempo reale
-export const getMessages = (mentorId, setMessages, setLoading) => {
-  const messagesRef = collection(db, "chat", mentorId, "messages");
-  const q = query(messagesRef, orderBy("timestamp"));
-
-  // Ascolta i cambiamenti in tempo reale
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    setLoading(false);
-    const msgs = snapshot.docs.map((doc) => doc.data());
-    setMessages(msgs);
-  }, (error) => {
-    console.error("Errore nel recupero dei messaggi: ", error);
-    setLoading(false);
-  });
-
-  // Restituisce la funzione per annullare l'iscrizione
-  return unsubscribe;
-};
+}
+// Invia un messaggio alla chat di supporto
+export async function sendSupportMessage(message) {
+  try {
+    await addDoc(supportCollection, message); // Aggiungi il messaggio alla raccolta
+    console.log("Messaggio inviato:", message); // Debug
+  } catch (err) {
+    console.error("Errore durante l'invio del messaggio di supporto:", err);
+    throw new Error("Impossibile inviare il messaggio.");
+  }
+}

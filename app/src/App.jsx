@@ -18,6 +18,7 @@ import DettaglioProfilo from './components/pages/DettaglioProfilo';
 import MatchingResultPage from './components/pages/MatchingResultPage';
 import SupportoFem from './components/pages/SupportoFemminile';
 import Supporto from "./components/pages/Supporto";
+import ChatSupporto from './components/pages/ChatSupporto'; 
 
 function App() {
   const db = app;
@@ -43,6 +44,9 @@ function App() {
             <Route path="/matchingpage" element={<MatchingResultPage/>} />
             <Route path="/supfem" element={<SupportoFem />} />
             <Route path="/support" element={<Supporto />} />
+            <Route path="/chat-support" element={<ChatSupporto />} /> {/* Nuova route */}
+            <Route path="/chat-support/:mentorId" element={<ChatSupporto />} />
+
           </Route>
           <Route element={<PrivateRoutes roles={["mentor"]}/>}>
             <Route path="/addfile" element={<FileAddDocument />} />
