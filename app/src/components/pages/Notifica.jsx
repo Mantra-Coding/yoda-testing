@@ -2,27 +2,27 @@
 import { useState, useEffect } from 'react';
 import NotificationCard from '@/components/ui/NotificationCard';
 import Header from '@/components/ui/Header';
-import { useNavigate } from 'react-router-dom';
 import { getByDest, deleteNotifica, getCurrentNotificaId } from '@/dao/notificaDAO';
 import { useAuth } from '@/auth/auth-context';
-
+import { initializeMentorship } from '@/dao/mentorshipSessionDAO';
 
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
-  const navigate = useNavigate();
-
   const { userId } = useAuth();
 
   //  Carica notifiche all'avvio
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-
         const notificationsList = await getByDest(userId);
-        console.log(notificationsList);
 
-        setNotifications(notificationsList);
+        // Ordinare le notifiche per data (dalla più recente alla meno recente)
+        const sortedNotifications = notificationsList.sort((a, b) => b.timeStamp.toMillis() - a.timeStamp.toMillis());
+
+        console.log(sortedNotifications);
+
+        setNotifications(sortedNotifications);
       } catch (error) {
         console.error('Errore nel recupero delle notifiche:', error);
       }
@@ -42,12 +42,15 @@ export default function NotificationsPage() {
   };
 
   //  Visualizza dettaglio della notifica
-  const handleView = async (notification) => {
+  /*const handleView = async (notification) => {
     const id = getCurrentNotificaId(notification);
     if (id) {
       await deleteNotifica(id); // Elimina dopo la visualizzazione
       navigate(`/notification-detail/${id}`);
     }
+  }; */
+  const createMentorship = (notification) => {
+    initializeMentorship(notification.mittente, notification.destinatario);
   };
 
   return (
@@ -60,8 +63,8 @@ export default function NotificationsPage() {
             <NotificationCard
               key={notification.id}
               notification={notification}
-              onMarkAsRead={() => handleMarkAsRead(notification.id)}
-              onView={() => handleView(notification)}
+              onMarkAsRead={() => handleMarkAsRead(notification.id)} // Passa la funzione per segnare come letta
+              onAccettaMentorship={() => createMentorship(notification)} // Passa la funzione per accettare la mentorship
             />
           ))}
         </div>

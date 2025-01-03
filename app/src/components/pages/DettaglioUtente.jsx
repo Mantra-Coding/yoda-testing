@@ -24,34 +24,29 @@ import { createNotificationMentorship } from '@/dao/notificaDAO';
     - user: Oggetto con i dettagli dell'utente.
 */
 
-// Funzione che gestisce la richiesta di mentorship
-async function handleRichiestaMentorship() {
+
+function DettagliUtente({ user }) {
+  const { userId } = useAuth();
+  const isMentor = user.userType === "mentor";
+  const ownPage = userId === user.id;
+
+  // Funzione che gestisce la richiesta di mentorship
+async function handleRichiestaMentorship(user) {
   try {
-    // 1. Recupera l'ID dell'utente corrente
-    const currentUserId = await getCurrentUserUID();
-
-    // 2. Ottieni i dettagli dell'utente corrente (nome e cognome)
-    const currentUserData = await getUserByID(currentUserId);
-    const currentUserName = currentUserData.nome;
-    const currentUserSurname = currentUserData.cognome;
-
-    createNotificationMentorship(currentUserId, user.id, currentUserName, currentUserSurname);
-
+    createNotificationMentorship(userId, user.id, user.nome, user.cognome);
   }
-  catch {
+  catch (error){
     console.log("notifica mentorship non inviata con successo");
-
+    console.error(error);
   }
 }
-function DettagliUtente({ user }) {
-  const isMentor = user.userType === "mentor";
-  const { userId } = useAuth();
-  const ownPage = userId === user.id;
+
+
   function handleClick() {
     if (ownPage) {
       window.location.href = "/edit-profile"; return;
     }
-    if (isMentor) handleRichiestaMentorship();
+    if (isMentor) handleRichiestaMentorship(user);
     else console.log("[DettaglioUtente] RichiedoContatto")
   }
 
