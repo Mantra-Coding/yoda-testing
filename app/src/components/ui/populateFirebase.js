@@ -1,12 +1,5 @@
 import { getFirestore, setDoc, doc, getDoc } from "firebase/firestore";
 import { app } from "@/Firebase/firebase"; // Importa la configurazione Firebase
-import bcrypt from "bcryptjs";
-
-// Funzione per cifrare una password
-async function hashPassword(password) {
-    const salt = await bcrypt.genSalt(10);
-    return bcrypt.hash(password, salt);
-}
 
 // Ottieni Firestore
 const db = getFirestore(app);
@@ -14,19 +7,18 @@ const db = getFirestore(app);
 // Funzione per popolare il database
 async function populateDatabase() {
     try {
-        
-                // Assicurati che checkDoc sia definito prima dell'uso
-                const checkDoc = doc(db, "meta", "populated");
+        // Assicurati che checkDoc sia definito prima dell'uso
+        const checkDoc = doc(db, "meta", "populated");
 
-                // Controllo se il database è già popolato
-                const checkSnapshot = await getDoc(checkDoc);
-        
-                if (checkSnapshot.exists()) {
-                    console.log("Il database è già popolato. Salto il popolamento.");
-                    return;
-                }
-        
-                console.log("Popolamento del database in corso...");
+        // Controllo se il database è già popolato
+        const checkSnapshot = await getDoc(checkDoc);
+
+        if (checkSnapshot.exists()) {
+            console.log("Il database è già popolato. Salto il popolamento.");
+            return;
+        }
+
+        console.log("Popolamento del database in corso...");
 
         // Mentori
         const mentors = [
@@ -40,7 +32,7 @@ async function populateDatabase() {
                     cv: null,
                     dataNascita: "1985-07-10",
                     email: "rossi.ml@gmail.com",
-                    password: await hashPassword("000000"), 
+                    password: "000000", // Cripta la password con crypto
                     field: null,
                     meetingMode: "online",
                     nome: "Mario",
@@ -50,7 +42,7 @@ async function populateDatabase() {
                     titoloDiStudio: "laurea",
                     userType: "mentor",
                 },
-            },
+            },            
             {
                 id: "mentor2",
                 data: {
@@ -61,7 +53,7 @@ async function populateDatabase() {
                     cv: "cv_bianchi.pdf",
                     dataNascita: "1990-03-12",
                     email: "bianchi.ds@gmail.com",
-                    password: await hashPassword("000000"), 
+                    password: "000000", 
                     field: null,
                     meetingMode: "in-person",
                     nome: "Luigi",
@@ -82,7 +74,7 @@ async function populateDatabase() {
                     cv: "cv_verdi.pdf",
                     dataNascita: "1980-01-25",
                     email: "verdi.ai@gmail.com",
-                    password: await hashPassword("000000"), 
+                    password: "000000", 
                     field: null,
                     meetingMode: "hybrid",
                     nome: "Giovanni",
@@ -103,7 +95,7 @@ async function populateDatabase() {
                     cv: "cv_gialli.pdf",
                     dataNascita: "1982-08-19",
                     email: "gialli.cc@gmail.com",
-                    password: await hashPassword("000000"), 
+                    password: "000000", 
                     field: null,
                     meetingMode: "online",
                     nome: "Alessandro",
@@ -124,7 +116,7 @@ async function populateDatabase() {
                     cv: "cv_neri.pdf",
                     dataNascita: "1995-06-05",
                     email: "neri.bc@gmail.com",
-                    password: await hashPassword("000000"), 
+                    password: "000000", 
                     field: null,
                     meetingMode: "online",
                     nome: "Francesco",
@@ -148,7 +140,7 @@ async function populateDatabase() {
                     cv: "cv_bruni.pdf",
                     dataNascita: "1998-08-14",
                     email: "bruni.js@gmail.com",
-                    password: await hashPassword("000000"), 
+                    password: "000000", 
                     field: "web-development",
                     nome: "Giorgio",
                     occupazione: null,
@@ -168,7 +160,7 @@ async function populateDatabase() {
                     cv: "cv_luca.pdf",
                     dataNascita: "2000-05-20",
                     email: "luca.py@gmail.com",
-                    password: await hashPassword("000000"), 
+                    password: "000000", 
                     field: "data-science",
                     nome: "Matteo",
                     occupazione: "Junior Data Analyst",
@@ -188,7 +180,7 @@ async function populateDatabase() {
                     cv: "cv_verdi.pdf",
                     dataNascita: "1999-03-30",
                     email: "verdi.web@gmail.com",
-                    password: await hashPassword("000000"), 
+                    password: "000000", 
                     field: "front-end",
                     nome: "Luca",
                     occupazione: null,
@@ -208,7 +200,7 @@ async function populateDatabase() {
                     cv: "cv_alti.pdf",
                     dataNascita: "1997-11-12",
                     email: "alti.java@gmail.com",
-                    password: await hashPassword("000000"), 
+                    password: "000000", 
                     field: "software-engineering",
                     nome: "Marco",
                     occupazione: null,
@@ -228,7 +220,7 @@ async function populateDatabase() {
                     cv: "cv_rossi.pdf",
                     dataNascita: "2001-07-09",
                     email: "rossi.cs@gmail.com",
-                    password: await hashPassword("000000"), 
+                    password: "000000", 
                     field: "backend-development",
                     nome: "Giovanni",
                     occupazione: "Junior Developer",
