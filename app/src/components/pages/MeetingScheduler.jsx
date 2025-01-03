@@ -4,7 +4,6 @@ import { getMentees, createMeeting } from "@/dao/meetingsDAO";
 import Header from "@/components/ui/header";
 import { useAuth } from '@/auth/auth-context';
 const MeetingScheduler = () => {
-  const [user, setUser] = useState(null);
   const [mentees, setMentees] = useState([]);
   const [formData, setFormData] = useState({
     date: '',
@@ -15,6 +14,7 @@ const MeetingScheduler = () => {
   });
   const {userId} = useAuth();
   const {nome} = useAuth();
+  const {cognome} = useAuth();
   // Controllo se l'utente è un mentor e recupero i partecipanti (mentees)
   useEffect(() => {
     const fetchMenteesData = async () => {
@@ -22,16 +22,11 @@ const MeetingScheduler = () => {
         const menteesList = await getMentees();
         setMentees(menteesList);
       } catch (error) {
-        console.error('Errore durante il recupero dei mentee:', error);
+        allert('Errore durante il recupero dei mentee:');
       }
     };
   
     fetchMenteesData();
-  
-    // Se non c'è nessun listener da disattivare, rimuovi il return
-    return () => {
-      console.log("Cleanup eseguito, ma non c'è nessun listener da disattivare.");
-    };
   }, []);
   
   // Funzione per convalidare il form
@@ -65,10 +60,6 @@ const MeetingScheduler = () => {
           alert('Partecipante non trovato');
           return;
         }
-
-        // Log dei dati del partecipante per debug
-        console.log('Dati del partecipante selezionato:', selectedParticipant);
-
         // Verifica che tutti i dati necessari siano disponibili
         if (!selectedParticipant.nome || !selectedParticipant.email) {
           alert('I dati del partecipante sono incompleti');
@@ -86,6 +77,7 @@ const MeetingScheduler = () => {
           description: formData.description,
           mentorId: userId,  // Assicurati che `user.uid` sia definito
           mentorName: nome,
+          mentorSurname: cognome,
           menteeId: selectedParticipant.id, // Questo dovrebbe essere l'ID del mentee
           menteeName: selectedParticipant.nome, // Usa 'nome' invece di 'name'
           menteeEmail: selectedParticipant.email,
@@ -95,7 +87,6 @@ const MeetingScheduler = () => {
         await createMeeting(newMeeting);
         alert('Incontro programmato con successo');
       } catch (error) {
-        console.error('Errore nella programmazione dell\'incontro: ', error);
         alert('Impossibile programmare l\'incontro');
       }
     } else {

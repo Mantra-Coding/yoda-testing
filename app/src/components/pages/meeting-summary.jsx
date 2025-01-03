@@ -6,13 +6,11 @@ import { Button } from "@/components/ui/button";
 
 function MeetingSummary() {
   const { meetingid } = useParams(); // Ottiene l'ID del meeting dai parametri dell'URL
-  console.log("ID:" + meetingid)
   const [meeting, setMeeting] = useState(null); // Stato per i dati del meeting
   const [loading, setLoading] = useState(true); // Stato per il caricamento
   const [error, setError] = useState(null); // Stato per eventuali errori
   const [successMessage, setSuccessMessage] = useState(""); // Stato per il messaggio di successo
 
-  const location = useLocation();
 
   useEffect(() => {
     const fetchMeeting = async () => {

@@ -1,6 +1,6 @@
 import { db } from "@/firebase/firebase";
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc, deleteDoc, addDoc , getDoc , increment,Timestamp } from 'firebase/firestore';
-
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, deleteDoc, addDoc , getDoc , increment} from 'firebase/firestore';
+import {createNotificationMeeting, updateNotificationMeeting, removeNotificationMeeting} from "@/dao/notificaDAO";
 /**
  * Recupera tutti gli incontri di un mentor dal database.
  * @param {string} mentorId - ID del mentor autenticato.
@@ -21,6 +21,7 @@ export const fetchMeetingsForMentor = async (mentorId) => {
       return {
         id: doc.id,
         menteeName: data.menteeName,
+        menteeId: data.menteeId,
         date: data.date.toDate(),
         time: data.time,
         description: data.description,
@@ -28,6 +29,7 @@ export const fetchMeetingsForMentor = async (mentorId) => {
       };
     });
   } catch (error) {
+    console.error("Errore durante il recupero degli incontri:", error);
     throw new Error("Impossibile recuperare gli incontri.");
   }
 };
@@ -55,6 +57,7 @@ export const fetchMeetingsForMentee = async (menteeId) => {
       };
     });
   } catch (error) {
+    console.error("Errore durante il recupero degli incontri:", error);
     throw new Error("Impossibile recuperare gli incontri.");
   }
 };
@@ -94,6 +97,7 @@ export const fetchMeetingDetails = async (meetingId) => {
       minuta: meetingData.minuta || null, // Valore predefinito se mancante
     };
   } catch (error) {
+    console.error("Errore durante il recupero dei dettagli dell'incontro:", error);
     throw new Error("Impossibile recuperare i dettagli dell'incontro.");
   }
 };
@@ -110,6 +114,7 @@ export const updateMeetingMinutes = async (meetingId, minuta) => {
     const meetingRef = doc(db, 'meetings', meetingId);
     await updateDoc(meetingRef, { minuta: minuta });  // Aggiorna solo il campo MINUTA
   } catch (error) {
+    console.error('Errore durante l\'aggiornamento della minuta:', error);
     throw error;
   }
 };
@@ -122,38 +127,9 @@ export const updateMeetingMinutes = async (meetingId, minuta) => {
 
 export const createMeeting = async (meetingData) => {
   try {
+    // Verifica che userType sia mentee
     if (meetingData.userType !== "mentee") {
       throw new Error("Il tipo di utente deve essere mentee");
-    }
-
-    // Converte la data in Timestamp Firestore
-    const meetingDate = meetingData.date instanceof Timestamp
-      ? meetingData.date
-      : Timestamp.fromDate(new Date(meetingData.date));
-
-    // Converte l'orario in minuti per confrontarlo
-    const [hours, minutes] = meetingData.time.split(":").map(Number);
-    const meetingMinutes = hours * 60 + minutes; // Converti in minuti totali
-
-    // Query per trovare incontri nello stesso giorno con il mentor
-    const meetingsRef = collection(db, "meetings");
-    const existingMeetingsQuery = query(
-      meetingsRef,
-      where("mentorId", "==", meetingData.mentorId),
-      where("date", "==", meetingDate)
-    );
-
-    const existingMeetingsSnapshot = await getDocs(existingMeetingsQuery);
-
-    for (const doc of existingMeetingsSnapshot.docs) {
-      const existingMeeting = doc.data();
-      const [existingHours, existingMinutes] = existingMeeting.time.split(":").map(Number);
-      const existingMeetingMinutes = existingHours * 60 + existingMinutes; // Converti in minuti totali
-
-      // Controllo intervallo di 10 minuti
-      if (Math.abs(meetingMinutes - existingMeetingMinutes) < 10) {
-        throw new Error("Non è possibile schedulare un meeting a meno di 10 minuti di distanza da un altro.");
-      }
     }
 
     // Recupera il riferimento al documento del mentee
@@ -166,7 +142,37 @@ export const createMeeting = async (meetingData) => {
 
     const menteeData = menteeSnap.data();
 
-    // Aggiorna il contatore di meeting
+    // Converte la data in Timestamp Firestore
+    const meetingDate = meetingData.date instanceof Timestamp
+      ? meetingData.date
+      : Timestamp.fromDate(new Date(meetingData.date));
+
+    // Converte l'orario in minuti totali
+    const [hours, minutes] = meetingData.time.split(":").map(Number);
+    const meetingMinutes = hours * 60 + minutes;
+
+    // Query per trovare incontri nello stesso giorno con lo stesso mentor
+    const meetingsRef = collection(db, "meetings");
+    const existingMeetingsQuery = query(
+      meetingsRef,
+      where("mentorId", "==", meetingData.mentorId),
+      where("date", "==", meetingDate)
+    );
+
+    const existingMeetingsSnapshot = await getDocs(existingMeetingsQuery);
+
+    for (const doc of existingMeetingsSnapshot.docs) {
+      const existingMeeting = doc.data();
+      const [existingHours, existingMinutes] = existingMeeting.time.split(":").map(Number);
+      const existingMeetingMinutes = existingHours * 60 + existingMinutes;
+
+      // Controllo intervallo di 10 minuti
+      if (Math.abs(meetingMinutes - existingMeetingMinutes) < 10) {
+        throw new Error("Non è possibile schedulare un meeting a meno di 10 minuti di distanza da un altro.");
+      }
+    }
+
+    // Aggiorna il contatore di meeting del mentee
     if (typeof menteeData.meetingsCount === "number") {
       await updateDoc(menteeRef, { meetingsCount: increment(1) });
     } else {
@@ -178,6 +184,7 @@ export const createMeeting = async (meetingData) => {
       mentorId: meetingData.mentorId,
       menteeId: meetingData.menteeId,
       mentorName: meetingData.mentorName,
+      mentorSurname: meetingData.mentorSurname,
       date: meetingDate,
       time: meetingData.time,
       topic: meetingData.topic,
@@ -187,8 +194,12 @@ export const createMeeting = async (meetingData) => {
       minuta: null,
     };
 
-    // Aggiungi il meeting al database
+    // Aggiungi il nuovo meeting al database
     const docRef = await addDoc(collection(db, "meetings"), newMeeting);
+
+    // Crea la notifica per il meeting
+    await createNotificationMeeting(newMeeting.mentorId, newMeeting.menteeId, newMeeting.mentorName, newMeeting.mentorSurname);
+
     return docRef.id;
   } catch (error) {
     throw error;
@@ -201,10 +212,11 @@ export const createMeeting = async (meetingData) => {
  * @param {Object} updatedData - I dati da aggiornare.
  * @returns {Promise<void>}
  */
-export const updateMeeting = async (meetingId, updatedData) => {
+export const updateMeeting = async (updatedData, menteeId, mittenteId,nome,cognome) => {
   try {
-    const meetingRef = doc(db, 'meetings', meetingId);
+    const meetingRef = doc(db, 'meetings', updatedData.id);
     await updateDoc(meetingRef, updatedData);
+    await updateNotificationMeeting(mittenteId,menteeId,nome,cognome);
   } catch (error) {
     throw error;
   }
@@ -215,10 +227,11 @@ export const updateMeeting = async (meetingId, updatedData) => {
  * @param {string} meetingId - ID dell'incontro da eliminare.
  * @returns {Promise<void>}
  */
-export const deleteMeeting = async (meetingId) => {
+export const deleteMeeting = async (meetingId,menteeId,userId,nome,cognome) => {
   try {
     const meetingRef = doc(db, 'meetings', meetingId);
     await deleteDoc(meetingRef);
+    await removeNotificationMeeting(userId,menteeId,nome, cognome);
   } catch (error) {
     throw error;
   }

@@ -1,4 +1,3 @@
-// Updated CalendarioIncontri.js with Edit and Delete
 import React, { useState, useEffect } from 'react';
 import Header from "@/components/ui/header";
 import { Link } from 'react-router-dom';
@@ -12,13 +11,14 @@ const CalendarioIncontri = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [editingMeeting, setEditingMeeting] = useState(null);
-  const {userId} = useAuth();
+  const {userId,nome,cognome} = useAuth();
   const fetchMeetings = async () => {
     try {
       const fetchedMeetings = await fetchMeetingsForMentor(userId);
       setMeetings(fetchedMeetings);
     } catch (error) {
       alert("Errore durante il recupero degli incontri.");
+      console.error(error);
     }
   };
 
@@ -28,21 +28,22 @@ const CalendarioIncontri = () => {
 
   const handleSaveEdit = async (updatedMeeting) => {
     try {
-      await updateMeeting(updatedMeeting.id, updatedMeeting);
+      await updateMeeting(updatedMeeting, updatedMeeting.menteeId,userId,nome,cognome);
       setMeetings((prevMeetings) =>
         prevMeetings.map((m) => (m.id === updatedMeeting.id ? updatedMeeting : m))
       );
       setEditingMeeting(null);
     } catch (error) {
+      alert("Errore durante la modifica degli incontri.");
     }
   };
 
-  const handleDelete = async (meetingId) => {
+  const handleDelete = async (meetingId,menteeId) => {
     try {
-      await deleteMeeting(meetingId);
+      await deleteMeeting(meetingId,menteeId,userId,nome,cognome);
       setMeetings((prevMeetings) => prevMeetings.filter((m) => m.id !== meetingId));
     } catch (error) {
-      alert("Errore durante ll'eliminazione dell'incontro.");
+      alert("Errore durante l'eliminazione degli incontri.");
     }
   };
 
@@ -253,7 +254,7 @@ const CalendarioIncontri = () => {
                     Modifica
                   </Button>
                   <Button
-                    onClick={() => handleDelete(meeting.id)}
+                    onClick={() => handleDelete(meeting.id,meeting.menteeId)}
                     style={{
                       backgroundColor: '#EF4444',
                       color: 'white',
