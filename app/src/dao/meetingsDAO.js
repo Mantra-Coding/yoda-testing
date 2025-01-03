@@ -182,9 +182,9 @@ export const createMeeting = async (meetingData) => {
  * @param {Object} updatedData - I dati da aggiornare.
  * @returns {Promise<void>}
  */
-export const updateMeeting = async (meetingId, menteeId, mittenteId,nome,cognome) => {
+export const updateMeeting = async (updatedData, menteeId, mittenteId,nome,cognome) => {
   try {
-    const meetingRef = doc(db, 'meetings', meetingId);
+    const meetingRef = doc(db, 'meetings', updatedData.id);
     await updateDoc(meetingRef, updatedData);
     await updateNotificationMeeting(mittenteId,menteeId,nome,cognome);
   } catch (error) {

@@ -30,10 +30,10 @@ const CalendarioIncontri = () => {
     setEditingMeeting(meeting);
   };
 
-  const handleSaveEdit = async (meeting,updatedMeeting) => {
+  const handleSaveEdit = async (updatedMeeting) => {
     console.log("Tentativo di aggiornamento:", updatedMeeting);
     try {
-      await updateMeeting(updatedMeeting.id,meeting.menteeId,userId,nome,cognome);
+      await updateMeeting(updatedMeeting, updatedMeeting.menteeId,userId,nome,cognome);
       setMeetings((prevMeetings) =>
         prevMeetings.map((m) => (m.id === updatedMeeting.id ? updatedMeeting : m))
       );
@@ -346,7 +346,7 @@ const CalendarioIncontri = () => {
                   description: e.target.description.value,
                   topic: e.target.topic.value,
                 };
-                handleSaveEdit(editingMeeting,updatedMeeting);
+                handleSaveEdit(updatedMeeting);
               }}
             >
               <div style={{ marginBottom: '8px' }}>
