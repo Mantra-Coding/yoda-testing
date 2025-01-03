@@ -1,8 +1,24 @@
 import { getFirestore, setDoc, doc, getDoc } from "firebase/firestore";
-import { app } from "@/Firebase/firebase"; // Importa la configurazione Firebase
+import { app } from "@/firebase/firebase"; // Importa la configurazione Firebase
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // Ottieni Firestore
 const db = getFirestore(app);
+const storage = getStorage(app);
+
+
+// Funzione per caricare il video e ottenere l'URL
+async function uploadVideo(fileName, videoFile) {
+    try {
+        const storageRef = ref(storage, 'videos/' + fileName); // Crea un riferimento nel storage
+        const snapshot = await uploadBytes(storageRef, videoFile); // Carica il file
+        const downloadURL = await getDownloadURL(snapshot.ref); // Ottieni l'URL del video
+        return downloadURL; // Ritorna l'URL
+    } catch (error) {
+        console.error("Errore durante il caricamento del video:", error);
+        return null;
+    }
+}
 
 // Funzione per popolare il database
 async function populateDatabase() {
@@ -286,7 +302,7 @@ async function populateDatabase() {
                 description: "Guida all'intelligenza artificiale per principianti",
                 thumbnail: "default-thumbnail-url",
                 title: "AI for Beginners",
-                videoUrl: "http://localhost:9199/v0/b/yoda/videos/Video6- Intelligenza Artificiale.mp4",
+                videoUrl: "videos/Video6- Intelligenza Artificiale.mp4",
             },
         },
         {
@@ -295,7 +311,7 @@ async function populateDatabase() {
                 description: "Introduzione alla programmazione in Python",
                 thumbnail: "default-thumbnail-url",
                 title: "Python Programming Basics",
-                videoUrl: "http://localhost:9199/v0/b/yoda/videos/Video7- Phyton.mp4",
+                videoUrl: "videos/Video7- Phyton.mp4",
             },
         },
         {
@@ -304,7 +320,7 @@ async function populateDatabase() {
                 description: "Corso completo su Data Science con Python",
                 thumbnail: "default-thumbnail-url",
                 title: "Data Science with Python",
-                videoUrl: "http://localhost:9199/v0/b/yoda/videos/Video8- DataScience.mp4",
+                videoUrl: "videos/Video8- DataScience.mp4",
             },
         },
         {
@@ -313,7 +329,7 @@ async function populateDatabase() {
                 description: "Come sviluppare applicazioni con React",
                 thumbnail: "default-thumbnail-url",
                 title: "React for Developers",
-                videoUrl: "http://localhost:9199/v0/b/yoda/videos/Video9- React.mp4",
+                videoUrl: "videos/Video9- React.mp4",
             },
         },
         {
@@ -322,10 +338,21 @@ async function populateDatabase() {
                 description: "Fondamenti di Cloud Computing con AWS",
                 thumbnail: "default-thumbnail-url",
                 title: "Cloud Computing Essentials with AWS",
-                videoUrl: "http://localhost:9199/v0/b/yoda/videos/Video10- Cloud Computing.mp4",
+                videoUrl: "videos/Video10- Cloud Computing.mp4",
             },
         }
         ];
+
+          // Carica i video su Firebase Storage e ottieni l'URL
+          for (const video of videos) {
+            const videoFile = video.data.videoUrl; // Usa il nome del file come riferimento
+            const videoUrl = await uploadVideo(videoFile, videoFile); // Carica e ottieni l'URL
+
+            // Se l'upload è riuscito, aggiorna l'oggetto video con l'URL
+            if (videoUrl) {
+                video.data.videoUrl = videoUrl;
+            }
+        }
 
         // Autori
         const authors = [
