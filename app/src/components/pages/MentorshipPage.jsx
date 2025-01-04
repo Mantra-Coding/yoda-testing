@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/ui/Header";
 
 const MentorshipPage = () => {
-    const { userId, userType } = useAuth(); // Prendiamo ID e tipo utente dal contesto Auth
+    const { userId, userType } = useAuth();
     const [mentorshipSessions, setMentorshipSessions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedCard, setExpandedCard] = useState(null);
@@ -40,6 +40,11 @@ const MentorshipPage = () => {
         navigate(route);
     };
 
+    const handleDetailClick = (session) => {
+        const route = userType === "mentor" ? `/dettagli/${session.menteeId}` : `/dettagli/${session.mentoreId}`;
+        navigate(route);
+    };
+
     const handleCloseSession = async (sessionId) => {
         try {
             await closeMentorshipSession(sessionId);
@@ -67,7 +72,9 @@ const MentorshipPage = () => {
                     {mentorshipSessions.length > 0 ? (
                         mentorshipSessions.map((session) => {
                             const isMentee = userType === "mentee";
-                            const displayName = isMentee ? `${session.mentoreNome} ${session.mentoreCognome}` : `${session.menteeNome} ${session.menteeCognome}`;
+                            const displayName = isMentee
+                                ? `${session.mentoreNome} ${session.mentoreCognome}`
+                                : `${session.menteeNome} ${session.menteeCognome}`;
                             const displayLabel = isMentee ? "Mentore" : "Mentee";
 
                             const initials = displayName
@@ -111,8 +118,10 @@ const MentorshipPage = () => {
                                                         Dettagli della Sessione
                                                     </h3>
                                                     <p>
-                                                        <strong>Data di Creazione:</strong> {" "}
-                                                        {new Date(session.createdAt.seconds * 1000).toLocaleString()}
+                                                        <strong>Data di Creazione:</strong>{" "}
+                                                        {session.createdAt?.seconds
+                                                            ? new Date(session.createdAt.seconds * 1000).toLocaleString()
+                                                            : "Data non disponibile"}
                                                     </p>
                                                     <p>
                                                         <strong>Stato:</strong> {session.stato}
@@ -127,12 +136,20 @@ const MentorshipPage = () => {
                                                         <MessageSquare className="h-4 w-4 mr-2" />
                                                         Message
                                                     </Button>
-                                                    <Button variant="outline" className="flex-1">
+                                                    <Button
+                                                        variant="outline"
+                                                        className="flex-1"
+                                                        onClick={() => handleDetailClick(session)}
+                                                    >
                                                         <FileEdit className="h-4 w-4 mr-2" />
                                                         Details
                                                     </Button>
                                                     {userType === "mentor" && session.stato === "Attiva" && (
-                                                        <Button variant="destructive" className="flex-1" onClick={() => handleCloseSession(session.id)}>
+                                                        <Button
+                                                            variant="destructive"
+                                                            className="flex-1"
+                                                            onClick={() => handleCloseSession(session.id)}
+                                                        >
                                                             <XCircle className="h-4 w-4 mr-2" />
                                                             Chiudi Sessione
                                                         </Button>
