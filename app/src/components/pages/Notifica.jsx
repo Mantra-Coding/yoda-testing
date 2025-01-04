@@ -5,7 +5,7 @@ import Header from '@/components/ui/Header';
 import { getByDest, deleteNotifica, getCurrentNotificaId } from '@/dao/notificaDAO';
 import { useAuth } from '@/auth/auth-context';
 import { initializeMentorship } from '@/dao/mentorshipSessionDAO';
-
+import {removeExpiredNotifications} from '@/dao/notificaDAO';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
@@ -15,6 +15,7 @@ export default function NotificationsPage() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
+        await removeExpiredNotifications();
         const notificationsList = await getByDest(userId);
 
         // Ordinare le notifiche per data (dalla più recente alla meno recente)

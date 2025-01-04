@@ -39,6 +39,7 @@ export async function removeNotificationMentorship(mittenteId, destinatarioId, n
   );
 }
 
+
 /**
  * Crea una notifica per un nuovo meeting schedulato.
  * @param {string} mittenteId - ID dell'utente mittente.
@@ -98,7 +99,7 @@ export async function removeNotificationMeeting(mittenteId, destinatarioId, nome
  * @param {string} corpo - Corpo della notifica.
  * @param {string} type - Tipo della notifica.
  */
-async function createNotification(mittenteId, destinatarioId, oggetto, corpo, type) {
+export async function createNotification(mittenteId, destinatarioId, oggetto, corpo, type) {
   try {
     /**
      * Oggetto che rappresenta una notifica da creare.
@@ -108,14 +109,20 @@ async function createNotification(mittenteId, destinatarioId, oggetto, corpo, ty
      * @property {string} corpo - Testo del messaggio della notifica.
      * @property {string} type - Tipo della notifica.
      * @property {Date} timeStamp - Timestamp corrente della creazione.
+     * @property {Date} scadenza - Data di scadenza della notifica (24 ore dopo la creazione).
      */
+    const timeStamp = new Date();
+    const expirationTime = 60 * 1000; // 24 ore in millisecondi
+    const expirationDate = new Date(timeStamp.getTime() + expirationTime); // Data di scadenza
+
     const newNotification = {
       mittente: mittenteId,
       destinatario: destinatarioId,
       oggetto: oggetto,
       corpo: corpo,
       type: type,
-      timeStamp: new Date(),
+      timeStamp: timeStamp,
+      scadenza: expirationDate,  // Aggiungi la data di scadenza
     };
 
     await addDoc(notificationsCollectionRef, newNotification);
@@ -125,7 +132,28 @@ async function createNotification(mittenteId, destinatarioId, oggetto, corpo, ty
     throw error;
   }
 }
+export async function removeExpiredNotifications() {
+  try {
+    const now = new Date();
 
+    // Esegui una query per recuperare tutte le notifiche con una scadenza precedente alla data attuale
+    const notificationsRef = collection(db, "notifiche");
+    const expiredNotificationsQuery = query(notificationsRef, where("scadenza", "<=", now));
+
+    const querySnapshot = await getDocs(expiredNotificationsQuery);
+
+    // Itera su ogni notifica e elimina quelle scadute
+    querySnapshot.forEach(async (doc) => {
+      await deleteDoc(doc.ref);
+      console.log(`Notifica ${doc.id} eliminata perché scaduta.`);
+    });
+
+    console.log("Pulizia delle notifiche scadute completata.");
+  } catch (error) {
+    console.error("Errore durante la rimozione delle notifiche scadute:", error);
+    throw error;
+  }
+}
 /**
  * Recupera tutte le notifiche di un utente.
  * @param {string} userId - ID dell'utente loggato.
