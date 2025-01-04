@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Search, Bell, User } from 'lucide-react';
+import { Bell, User, Menu } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const auth = getAuth();
@@ -21,6 +22,10 @@ export default function Header() {
     setIsMenuOpen((prev) => !prev);
   };
 
+  const toggleDropdown = () => {
+    setIsDropdownOpen((prev) => !prev);
+  };
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -34,7 +39,7 @@ export default function Header() {
   return (
     <header className="bg-white border-b border-green-200 px-6 py-3">
       <div className="flex items-center justify-between">
-        {/* Logo e Titolo */}
+        {/* Logo */}
         <div className="flex items-center">
           <Link to="/">
             <h1 className="text-2xl font-bold text-[#178563]">Yoda</h1>
@@ -42,40 +47,6 @@ export default function Header() {
           <span className="ml-2 text-sm text-green-600">
             Piattaforma di Mentorship
           </span>
-        </div>
-
-        {/* Menu di navigazione */}
-        <nav className="flex space-x-8">
-          <Link
-            to="/contents"
-            className="text-sm text-green-700 hover:text-green-500 font-semibold tracking-wide uppercase"
-          >
-            CONTENUTI
-          </Link>
-          <Link
-            to="/videos"
-            className="text-sm text-green-700 hover:text-green-500 font-semibold tracking-wide uppercase"
-          >
-            VIDEO
-          </Link>
-          <Link
-            to="/personal-area"
-            className="text-sm text-green-700 hover:text-green-500 font-semibold tracking-wide uppercase"
-          >
-            AREA PERSONALE
-          </Link>
-        </nav>
-
-        {/* Barra di ricerca */}
-        <div className="flex-1 max-w-xl mx-8">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Cerca mentori, argomenti o video"
-              className="w-full px-4 py-2 border border-green-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#178563]"
-            />
-            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-400" />
-          </div>
         </div>
 
         {/* Icone */}
@@ -129,6 +100,44 @@ export default function Header() {
                     </Link>
                   </>
                 )}
+              </div>
+            )}
+          </div>
+
+          {/* Menu a tendina */}
+          <div className="relative">
+            <button
+              onClick={toggleDropdown}
+              className="flex items-center text-green-600 focus:outline-none"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-green-200 rounded-lg shadow-lg">
+                <Link
+                  to="/contents"
+                  className="block px-4 py-2 text-sm text-green-700 hover:bg-green-100"
+                >
+                  CONTENUTI
+                </Link>
+                <Link
+                  to="/videos"
+                  className="block px-4 py-2 text-sm text-green-700 hover:bg-green-100"
+                >
+                  VIDEO
+                </Link>
+                <Link
+                  to="/personal-area"
+                  className="block px-4 py-2 text-sm text-green-700 hover:bg-green-100"
+                >
+                  AREA PERSONALE
+                </Link>
+                <Link
+                  to="/support"
+                  className="block px-4 py-2 text-sm text-green-700 hover:bg-green-100"
+                >
+                  SUPPORTO
+                </Link>
               </div>
             )}
           </div>
