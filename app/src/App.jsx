@@ -19,6 +19,10 @@ import MatchingResultPage from './components/pages/MatchingResultPage';
 import SupportoFem from './components/pages/SupportoFemminile';
 import Supporto from "./components/pages/Supporto";
 import ChatSupporto from './components/pages/ChatSupporto'; 
+import ChatListPage from "./components/pages/ChatListPage";
+
+
+
 
 function App() {
   const db = app;
@@ -46,6 +50,7 @@ function App() {
             <Route path="/support" element={<Supporto />} />
             <Route path="/chat-support" element={<ChatSupporto />} /> {/* Nuova route */}
             <Route path="/chat-support/:mentorId" element={<ChatSupporto />} />
+            <Route path="/chat-list" element={<ChatListPage />} />
 
           </Route>
           <Route element={<PrivateRoutes roles={["mentor"]}/>}>

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"; // Importa i component
 import { Button } from "@/components/ui/button"; // Importa il componente Button
 import { Phone, Mail } from "lucide-react"; // Importa le icone
 import { useNavigate } from "react-router-dom"; 
+import { useAuth } from "@/auth/auth-context";
 
 // Importazione dei componenti Select
 import {
@@ -20,6 +21,7 @@ export default function SupportPage() {
   const [loading, setLoading] = useState(true); // Stato per la gestione del caricamento
   const navigate = useNavigate(); // Inizializza useNavigate
   const [selectedProblem, setSelectedProblem] = useState(""); // Stato per il problema selezionato
+  const { userType } = useAuth();
   
   useEffect(() => {
     const loadMentors = async () => {
@@ -60,23 +62,26 @@ export default function SupportPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-500 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#178563] to-[#edf2f7]">
       <Header /> {/* Aggiungi l'header */}
       <div className="mx-auto max-w-6xl space-y-8 p-6">
-        <div className="space-y-4">
-          <h1 className="text-2xl font-bold text-white">Richiedi Supporto</h1>
-          <Select onValueChange={(value) => setSelectedProblem(value)}>
-            <SelectTrigger className="w-full bg-white">
-              <SelectValue placeholder="Seleziona un tipo di problema" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="bullying">Bullying</SelectItem>
-              <SelectItem value="discrimination">Discrimination</SelectItem>
-              <SelectItem value="harassment">Harassment</SelectItem>
-              <SelectItem value="work-life">Work-Life Balance</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      {userType === "mentee" && ( // Mostra solo se l'utente è un mentee
+  <div className="space-y-4">
+    <h1 className="text-2xl font-bold text-white">Richiedi Supporto</h1>
+    <Select onValueChange={(value) => setSelectedProblem(value)}>
+      <SelectTrigger className="w-full bg-white">
+        <SelectValue placeholder="Seleziona un tipo di problema" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="bullying">Bullying</SelectItem>
+        <SelectItem value="discrimination">Discrimination</SelectItem>
+        <SelectItem value="harassment">Harassment</SelectItem>
+        <SelectItem value="work-life">Work-Life Balance</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+)}
+
   
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-white">Mentori Disponibili</h2>
@@ -118,6 +123,29 @@ export default function SupportPage() {
             ))}
           </div>
         </div>
+
+        <button
+  onClick={() => navigate("/chat-list")}
+  className="fixed bottom-8 right-8 z-50 flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-lg font-semibold rounded-full shadow-lg transition duration-300"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2}
+    stroke="currentColor"
+    className="w-6 h-6 mr-2"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M8 10h.01M12 10h.01M16 10h.01M21 16.938c0 2.485-3.582 4.5-8 4.5s-8-2.015-8-4.5M21 12.938c0 2.485-3.582 4.5-8 4.5s-8-2.015-8-4.5m16 0c0 2.485-3.582-4.5-8-4.5s-8 2.015-8 4.5m16 0c0-2.485-3.582-4.5-8-4.5s-8 2.015-8 4.5"
+    />
+  </svg>
+  Chat Supporto
+</button>
+
+
 
         {/* Sezione Associazioni di Supporto */}
         <div className="space-y-4">

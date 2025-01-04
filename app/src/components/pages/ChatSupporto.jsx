@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getSupportMessages, sendSupportMessage } from "@/dao/chatSupportoDAO";
+import { getSupportMessages, sendSupportMessage,createChat } from "@/dao/chatSupportoDAO";
 import app from "@/firebase/firebase";
 import { getFirestore, getDoc, doc } from "firebase/firestore";
 import { useAuth } from "@/auth/auth-context";
@@ -8,10 +8,10 @@ import { useParams, useLocation } from "react-router-dom";
 
 
 
+
 const db = getFirestore(app);
 
 export default function ChatSupporto() {
-  const { userId } = useAuth();
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,9 @@ export default function ChatSupporto() {
   const { mentorId } = useParams(); // Recupera mentorId dall'URL
   const [mentorDetails, setMentorDetails] = useState(null);
   const location = useLocation();
-  const [inputPlaceholder, setInputPlaceholder] = useState("Scrivi un messaggio..."); // Placeholder di default
+  const { userId, userType, user } = useAuth(); // Aggiungi `user` per accedere al nome
+  const [menteeDetails, setMenteeDetails] = useState(null);
+
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search); // Estrai i parametri della query string
@@ -87,6 +89,36 @@ export default function ChatSupporto() {
     fetchMessages(); // Chiamata al caricamento dei messaggi
   }, [mentorId]); // Si attiva quando `mentorId` cambia
   
+//Use effect per il controllo mentore/mentee
+useEffect(() => {
+  const fetchMenteeDetails = async () => {
+    if (userType === "mentor" && messages.length > 0) {
+      try {
+        // Recupera l'ID del mentee dalla prima chat disponibile
+        const menteeId = messages[0]?.senderId !== userId ? messages[0]?.senderId : messages[0]?.chatId;
+        if (!menteeId) {
+          console.error("Mentee ID non disponibile.");
+          return;
+        }
+
+        const menteeDocRef = doc(db, "utenti", menteeId);
+        const menteeDoc = await getDoc(menteeDocRef);
+
+        if (menteeDoc.exists()) {
+          setMenteeDetails(menteeDoc.data());
+        } else {
+          console.warn("Dettagli del mentee non trovati.");
+        }
+      } catch (err) {
+        console.error("Errore durante il recupero dei dettagli del mentee:", err);
+      }
+    }
+  };
+
+  fetchMenteeDetails();
+}, [userType, messages]);
+
+
 
 
   const handleSendMessage = async () => {
@@ -96,25 +128,49 @@ export default function ChatSupporto() {
     }
   
     const newMessage = {
-      chatId: mentorId, // Associa il messaggio a questa chat
-      senderId: userId,
+      chatId: mentorId, // Usa l'ID della chat esistente o generato
+      senderId: userId, // ID dell'utente che invia il messaggio
       text: message,
       timestamp: Date.now(),
     };
   
     try {
-      await sendSupportMessage(newMessage); // Salva il messaggio su Firestore
-      setMessages((prev) => [...prev, newMessage]); // Aggiorna lo stato locale
-      setMessage(""); // Resetta il campo di input
+      // Determina il ruolo dell'utente corrente
+      const menteeId = userType === "mentee" ? userId : mentorId; // Se è un mentee, il suo ID è il `userId`
+      const mentorIdFinal = userType === "mentor" ? userId : mentorId; // Se è un mentore, il suo ID è il `userId`
+  
+      // Recupera i nomi corretti
+      const menteeName =
+        userType === "mentee"
+          ? `${user?.nome || "Mentee"} ${user?.cognome || "Sconosciuto"}`
+          : "";
+      const mentorName =
+        userType === "mentor"
+          ? `${user?.nome || "Mentore"} ${user?.cognome || "Sconosciuto"}`
+          : "";
+  
+      // Crea la chat solo se necessario
+      await createChat(mentorId, menteeId, menteeName, mentorIdFinal, mentorName);
+  
+      // Invia il messaggio
+      await sendSupportMessage(newMessage);
+  
+      // Aggiorna i messaggi nella chat
+      setMessages((prev) => [...prev, newMessage]);
+      setMessage("");
     } catch (err) {
       console.error("Errore durante l'invio del messaggio:", err);
       setError("Errore durante l'invio del messaggio.");
     }
   };
   
+  
+  
+  
+  
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#178563] to-white">
-      <div className="container mx-auto py-6">
+    <div className="min-h-screen bg-gradient-to-br from-[#178563] to-[#edf2f7]">
+    <div className="container mx-auto py-6 space-y-6 text-white">  
         <Card className="w-full bg-[#f8f9fa] mb-4 rounded-lg p-4 shadow-sm">
           <CardHeader>
           <Card className="w-full bg-[#f8f9fa] mb-4 rounded-lg p-6 shadow-lg">
@@ -136,11 +192,20 @@ export default function ChatSupporto() {
 
       {/* Dettagli del mentore */}
       <div className="flex flex-col">
-        <h2 className="text-3xl font-bold text-[#178563] mb-1">
-          {mentorDetails
-            ? `Hai Richiesto il supporto di ${mentorDetails.nome} ${mentorDetails.cognome}`
-            : "Caricamento dettagli mentore..."}
-        </h2>
+      <h2 className="text-3xl font-bold text-[#178563] mb-1">
+  {userType === "mentor"
+    ? `Stai supportando ${
+        menteeDetails?.nome && menteeDetails?.cognome
+          ? `${menteeDetails.nome} ${menteeDetails.cognome}`
+          : "Mentee Sconosciuto"
+      }`
+    : `Hai Richiesto il supporto di ${
+        mentorDetails?.nome && mentorDetails?.cognome
+          ? `${mentorDetails.nome} ${mentorDetails.cognome}`
+          : "Mentore Sconosciuto"
+      }`}
+</h2>
+
         <p className="text-lg text-gray-600">
           {mentorDetails?.occupazione || "Informazioni sul mentore"}
         </p>
@@ -213,25 +278,28 @@ export default function ChatSupporto() {
           </CardHeader>
         </Card>
 
-        <div className="bg-white rounded-lg shadow-md p-4 flex flex-col h-[calc(100vh-100px)]">
+        <div className="bg-white rounded-lg shadow-md p-4 flex flex-col h-[calc(100v-100px)]">
           
   
 
      {/* Input per inviare messaggi */}
-     <div className="flex items-center bg-white shadow-md rounded-lg p-3">
-  <input
-    type="text"
-    value={message}
-    onChange={(e) => setMessage(e.target.value)}
-    className="flex-1 px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#22A699]"
-  />
+     <div className="p-4 bg-gray-100 border-t flex items-center">
+     <input
+  type="text"
+  value={message}
+  onChange={(e) => setMessage(e.target.value)}
+  placeholder="Scrivi un messaggio..."
+  className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#22A699] outline-none text-gray-900"
+/>
+
   <button
     onClick={handleSendMessage}
-    className="ml-3 px-6 py-3 bg-[#22A699] hover:bg-[#178563] text-white font-bold rounded-lg shadow-lg"
+    className="ml-4 px-6 py-2 bg-[#22A699] text-white font-semibold rounded-lg shadow-md hover:bg-[#178563] transition"
   >
     Invia
   </button>
 </div>
+
 
 
 </div>
