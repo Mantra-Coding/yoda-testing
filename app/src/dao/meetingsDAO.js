@@ -93,7 +93,7 @@ export const fetchMeetingDetails = async (meetingId) => {
       description: meetingData.description,
       menteeName: meetingData.menteeName,
       mentorName: meetingData.mentorName,
-      menteeEmail: meetingData.menteeEmail,
+      menteeCognome: meetingData.menteeCognome,
       minuta: meetingData.minuta || null, // Valore predefinito se mancante
     };
   } catch (error) {
@@ -190,7 +190,7 @@ export const createMeeting = async (meetingData) => {
       topic: meetingData.topic,
       description: meetingData.description,
       menteeName: meetingData.menteeName,
-      menteeEmail: meetingData.menteeEmail,
+      menteeCognome: meetingData.menteeCognome,
       minuta: null,
     };
 
