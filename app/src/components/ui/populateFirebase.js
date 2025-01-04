@@ -1,21 +1,31 @@
 import { getFirestore, setDoc, doc, getDoc } from "firebase/firestore";
-import { app } from "@/firebase/firebase"; // Importa la configurazione Firebase
+import { app } from "@/Firebase/firebase"; // Importa la configurazione Firebase
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import fs from "fs"; // Modulo per leggere file locali
+import path from "path"; // Modulo per gestire i percorsi
 
 // Ottieni Firestore
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 
-// Funzione per caricare il video e ottenere l'URL
-async function uploadVideo(fileName, videoFile) {
+// Funzione per caricare un file locale su Firebase Storage Emulator e ottenere l'URL
+async function uploadLocalFileToEmulator(storagePath, localFilePath) {
     try {
-        const storageRef = ref(storage, 'videos/' + fileName); // Crea un riferimento nel storage
-        const snapshot = await uploadBytes(storageRef, videoFile); // Carica il file
-        const downloadURL = await getDownloadURL(snapshot.ref); // Ottieni l'URL del video
-        return downloadURL; // Ritorna l'URL
+        // Ottieni il riferimento al servizio di storage
+        const storage = getStorage(app);
+        
+        // Configura il collegamento agli emulatori (deve essere fatto prima di utilizzare lo storage)
+        
+            storage.useEmulator("localhost", 9199); // Imposta l'indirizzo e la porta dell'emulatore
+        
+
+        const fileData = fs.readFileSync(localFilePath); // Leggi il file dal percorso locale
+        const storageRef = ref(storage, storagePath); // Crea un riferimento nel storage
+        const snapshot = await uploadBytes(storageRef, fileData); // Carica il file
+        const downloadURL = await getDownloadURL(snapshot.ref); // Ottieni l'URL del file
+        return downloadURL;
     } catch (error) {
-        console.error("Errore durante il caricamento del video:", error);
+        console.error("Errore durante il caricamento del file sull'emulatore:", error);
         return null;
     }
 }
@@ -23,10 +33,8 @@ async function uploadVideo(fileName, videoFile) {
 // Funzione per popolare il database
 async function populateDatabase() {
     try {
-        // Assicurati che checkDoc sia definito prima dell'uso
-        const checkDoc = doc(db, "meta", "populated");
-
         // Controllo se il database è già popolato
+        const checkDoc = doc(db, "meta", "populated");
         const checkSnapshot = await getDoc(checkDoc);
 
         if (checkSnapshot.exists()) {
@@ -302,7 +310,7 @@ async function populateDatabase() {
                 description: "Guida all'intelligenza artificiale per principianti",
                 thumbnail: "default-thumbnail-url",
                 title: "AI for Beginners",
-                videoUrl: "videos/Video6- Intelligenza Artificiale.mp4",
+                videoUrl: "../videos/Video6- Intelligenza Artificiale.mp4",
             },
         },
         {
@@ -311,7 +319,7 @@ async function populateDatabase() {
                 description: "Introduzione alla programmazione in Python",
                 thumbnail: "default-thumbnail-url",
                 title: "Python Programming Basics",
-                videoUrl: "videos/Video7- Phyton.mp4",
+                videoUrl: "../videos/Video7- Phyton.mp4",
             },
         },
         {
@@ -320,7 +328,7 @@ async function populateDatabase() {
                 description: "Corso completo su Data Science con Python",
                 thumbnail: "default-thumbnail-url",
                 title: "Data Science with Python",
-                videoUrl: "videos/Video8- DataScience.mp4",
+                videoUrl: "../videos/Video8- DataScience.mp4",
             },
         },
         {
@@ -329,7 +337,7 @@ async function populateDatabase() {
                 description: "Come sviluppare applicazioni con React",
                 thumbnail: "default-thumbnail-url",
                 title: "React for Developers",
-                videoUrl: "videos/Video9- React.mp4",
+                videoUrl: "../videos/Video9- React.mp4",
             },
         },
         {
@@ -338,22 +346,13 @@ async function populateDatabase() {
                 description: "Fondamenti di Cloud Computing con AWS",
                 thumbnail: "default-thumbnail-url",
                 title: "Cloud Computing Essentials with AWS",
-                videoUrl: "videos/Video10- Cloud Computing.mp4",
+                videoUrl: "../videos/Video10- Cloud Computing.mp4",
             },
         }
         ];
 
-          // Carica i video su Firebase Storage e ottieni l'URL
-          for (const video of videos) {
-            const videoFile = video.data.videoUrl; // Usa il nome del file come riferimento
-            const videoUrl = await uploadVideo(videoFile, videoFile); // Carica e ottieni l'URL
-
-            // Se l'upload è riuscito, aggiorna l'oggetto video con l'URL
-            if (videoUrl) {
-                video.data.videoUrl = videoUrl;
-            }
-        }
-
+        
+    
         // Autori
         const authors = [
             {
@@ -361,7 +360,7 @@ async function populateDatabase() {
                 data: {
                     email: "author1@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/Documents/Documents1.pdf",
+                    filePath: "../Documents/Documents1.pdf",
                     icon: "📄",
                     role: "Researcher",
                     title: "AI and Ethics",
@@ -373,7 +372,7 @@ async function populateDatabase() {
                 data: {
                     email: "author2@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/Documents/Documents2.pdf",
+                    filePath: "../Documents/Documents2.pdf",
                     icon: "📄",
                     role: "Engineer",
                     title: "Cloud Architecture",
@@ -385,7 +384,7 @@ async function populateDatabase() {
                 data: {
                     email: "author3@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/Documents/Documents3.pdf",
+                    filePath: "../Documents/Documents3.pdf",
                     icon: "📄",
                     role: "Scientist",
                     title: "Blockchain for Future",
@@ -397,7 +396,7 @@ async function populateDatabase() {
                 data: {
                     email: "author4@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/Documents/Documents4.pdf",
+                    filePath: "../Documents/Documents4.pdf",
                     icon: "📄",
                     role: "Developer",
                     title: "Web Development Practices",
@@ -409,7 +408,7 @@ async function populateDatabase() {
                 data: {
                     email: "author5@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/Documents/Documents5.pdf",
+                    filePath: "../Documents/Documents5.pdf",
                     icon: "📄",
                     role: "Technologist",
                     title: "Understanding AI",
@@ -421,7 +420,7 @@ async function populateDatabase() {
                 data: {
                     email: "author6@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/Documents/Documents6.pdf",
+                    filePath: "../Documents/Documents6.pdf",
                     icon: "📄",
                     role: "Software Engineer",
                     title: "Building Scalable Web Apps",
@@ -433,7 +432,7 @@ async function populateDatabase() {
                 data: {
                     email: "author7@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/Documents/Documents7.pdf",
+                    filePath: "../Documents/Documents7.pdf",
                     icon: "📄",
                     role: "Data Scientist",
                     title: "Predictive Modeling with Python",
@@ -445,7 +444,7 @@ async function populateDatabase() {
                 data: {
                     email: "author8@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/Documents/Documents8.pdf",
+                    filePath: "../Documents/Documents8.pdf",
                     icon: "📄",
                     role: "Cloud Architect",
                     title: "Designing Cloud Systems",
@@ -457,7 +456,7 @@ async function populateDatabase() {
                 data: {
                     email: "author9@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/Documents/Documents9.pdf",
+                    filePath: "../Documents/Documents9.pdf",
                     icon: "📄",
                     role: "Blockchain Developer",
                     title: "Blockchain Development",
@@ -469,7 +468,7 @@ async function populateDatabase() {
                 data: {
                     email: "author10@gmail.com",
                     createdAt: new Date(),
-                    filePath: "http://localhost:9199/Documents/Documents10.pdf",
+                    filePath: "../Documents/Documents10.pdf",
                     icon: "📄",
                     role: "AI Specialist",
                     title: "Ethics in Artificial Intelligence",
@@ -622,6 +621,54 @@ async function populateDatabase() {
         console.log("Database popolato con successo!");
     } catch (error) {
         console.error("Errore durante il popolamento del database:", error);
+    }
+}
+
+  // Funzione per caricare i video su Firebase Storage Emulator e aggiornare Firestore Emulator
+  async function uploadVideosToEmulators(videos, videosBasePath) {
+    try {
+        const firestore = getFirestore();
+        firestore.useEmulator("localhost", 8080); // Configura l'emulatore di Firestore
+
+        for (const video of videos) {
+            const localVideoPath = path.join(videosBasePath, video.data.videoUrl);
+            const storagePath = `videos/${video.data.videoUrl}`;
+            const videoUrl = await uploadLocalFileToEmulator(storagePath, localVideoPath);
+
+            if (videoUrl) {
+                video.data.videoUrl = videoUrl; // Aggiorna l'URL con quello su Firebase Storage Emulator
+                
+                // Salva l'aggiornamento su Firestore Emulator
+                const videoDocRef = doc(firestore, "videos", video.id); // Crea un riferimento al documento
+                await setDoc(videoDocRef, video.data); // Aggiorna i dati su Firestore Emulator
+            }
+        }
+    } catch (error) {
+        console.error("Errore durante il caricamento dei video sugli emulatori:", error);
+    }
+}
+
+// Funzione per caricare i documenti su Firebase Storage Emulator e aggiornare Firestore Emulator
+async function uploadDocumentsToEmulators(authors, documentsBasePath) {
+    try {
+        const firestore = getFirestore();
+        firestore.useEmulator("localhost", 8080); // Configura l'emulatore di Firestore
+
+        for (const author of authors) {
+            const localDocPath = path.join(documentsBasePath, author.data.filePath);
+            const storagePath = `documents/${author.data.filePath}`;
+            const fileUrl = await uploadLocalFileToEmulator(storagePath, localDocPath);
+
+            if (fileUrl) {
+                author.data.filePath = fileUrl; // Aggiorna l'URL con quello su Firebase Storage Emulator
+                
+                // Salva l'aggiornamento su Firestore Emulator
+                const authorDocRef = doc(firestore, "authors", author.id); // Crea un riferimento al documento
+                await setDoc(authorDocRef, author.data); // Aggiorna i dati su Firestore Emulator
+            }
+        }
+    } catch (error) {
+        console.error("Errore durante il caricamento dei documenti sugli emulatori:", error);
     }
 }
 
