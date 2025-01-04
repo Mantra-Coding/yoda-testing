@@ -214,7 +214,7 @@ async function handleRichiestaMentorship(user) {
 
 
             {/* Azione finale */}
-            {!ownPage && userType === 'mentee' && (
+            {(ownPage || userType === 'mentee' || !isMentor) && (
             <div className="mt-6 flex justify-end">
               <Button className="bg-[#178563] text-white hover:bg-[#178563]/90" onClick={() => handleClick()}>
                 {ownPage
