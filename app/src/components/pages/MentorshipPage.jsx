@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/auth/auth-context";
-import { fetchMentorship } from "@/dao/mentorshipSessionDAO";
+import { fetchMentorship, closeMentorshipSession } from "@/dao/mentorshipSessionDAO";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, Calendar, MessageSquare, FileEdit } from "lucide-react";
-import Header from "@/components/ui/Header"; // ✅ Importazione dell'Header
+import { ChevronDown, ChevronUp, Calendar, MessageSquare, FileEdit, XCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import Header from "@/components/ui/Header";
 
 const MentorshipPage = () => {
-    const { userId } = useAuth(); // Prendiamo l'ID utente dal contesto Auth
+    const { userId, userType } = useAuth(); // Prendiamo ID e tipo utente dal contesto Auth
     const [mentorshipSessions, setMentorshipSessions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [expandedCard, setExpandedCard] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadMentorshipSessions = async () => {
@@ -18,7 +20,6 @@ const MentorshipPage = () => {
                 try {
                     const sessions = await fetchMentorship(userId);
                     setMentorshipSessions(sessions);
-
                 } catch (error) {
                     console.error("Errore nel caricamento delle sessioni mentorship:", error);
                 } finally {
@@ -34,13 +35,30 @@ const MentorshipPage = () => {
         setExpandedCard(expandedCard === id ? null : id);
     };
 
+    const handleScheduleClick = () => {
+        const route = userType === "mentor" ? "/Calendar" : "/CalendarMentee";
+        navigate(route);
+    };
+
+    const handleCloseSession = async (sessionId) => {
+        try {
+            await closeMentorshipSession(sessionId);
+            setMentorshipSessions((prevSessions) =>
+                prevSessions.map((session) =>
+                    session.id === sessionId ? { ...session, stato: "Inattivo" } : session
+                )
+            );
+        } catch (error) {
+            console.error("Errore nella chiusura della sessione:", error);
+        }
+    };
+
     if (loading) {
         return <p>Caricamento delle sessioni di mentorship...</p>;
     }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-emerald-700 to-emerald-50">
-            {/* ✅ Aggiunto Header */}
             <Header />
 
             <div className="container px-4 py-8">
@@ -48,7 +66,11 @@ const MentorshipPage = () => {
                 <div className="space-y-4">
                     {mentorshipSessions.length > 0 ? (
                         mentorshipSessions.map((session) => {
-                            const initials = session.mentore
+                            const isMentee = userType === "mentee";
+                            const displayName = isMentee ? `${session.mentoreNome} ${session.mentoreCognome}` : `${session.menteeNome} ${session.menteeCognome}`;
+                            const displayLabel = isMentee ? "Mentore" : "Mentee";
+
+                            const initials = displayName
                                 .split(" ")
                                 .map((word) => word[0])
                                 .join("")
@@ -71,7 +93,7 @@ const MentorshipPage = () => {
                                                     {initials}
                                                 </div>
                                                 <span className="font-medium">
-                                                    Mentore: {session.mentore}
+                                                    {displayLabel}: {displayName}
                                                 </span>
                                             </div>
                                             {expandedCard === session.id ? (
@@ -89,17 +111,15 @@ const MentorshipPage = () => {
                                                         Dettagli della Sessione
                                                     </h3>
                                                     <p>
-                                                        <strong>Mentee:</strong> {session.mentee}
+                                                        <strong>Data di Creazione:</strong> {" "}
+                                                        {new Date(session.createdAt.seconds * 1000).toLocaleString()}
                                                     </p>
                                                     <p>
-                                                        <strong>Data di Creazione:</strong>{" "}
-                                                        {new Date(
-                                                            session.createdAt.seconds * 1000
-                                                        ).toLocaleString()}
+                                                        <strong>Stato:</strong> {session.stato}
                                                     </p>
                                                 </div>
                                                 <div className="flex gap-3 pt-4 border-t">
-                                                    <Button variant="outline" className="flex-1">
+                                                    <Button variant="outline" className="flex-1" onClick={handleScheduleClick}>
                                                         <Calendar className="h-4 w-4 mr-2" />
                                                         Schedule
                                                     </Button>
@@ -111,6 +131,12 @@ const MentorshipPage = () => {
                                                         <FileEdit className="h-4 w-4 mr-2" />
                                                         Details
                                                     </Button>
+                                                    {userType === "mentor" && session.stato === "Attiva" && (
+                                                        <Button variant="destructive" className="flex-1" onClick={() => handleCloseSession(session.id)}>
+                                                            <XCircle className="h-4 w-4 mr-2" />
+                                                            Chiudi Sessione
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </CardContent>

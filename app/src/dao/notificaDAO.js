@@ -20,6 +20,24 @@ export async function createNotificationMentorship(mittenteId, destinatarioId, n
     'mentorship-request'
   );
 }
+export async function acceptNotificationMentorship(mittenteId, destinatarioId, nomeMittente, cognomeMittente) {
+  await createNotification(
+    mittenteId,
+    destinatarioId,
+    'Mentorship',
+    `Il mentore: ${nomeMittente} ${cognomeMittente} ha accettato la tua richiesta di mentorship`,
+    'mentorship-session'
+  );
+}
+export async function removeNotificationMentorship(mittenteId, destinatarioId, nomeMittente, cognomeMittente) {
+  await createNotification(
+    mittenteId,
+    destinatarioId,
+    'Mentorship',
+    `Il mentore: ${nomeMittente} ${cognomeMittente} ha terminato la tua sessione di mentorship`,
+    'mentorship-session'
+  );
+}
 
 /**
  * Crea una notifica per un nuovo meeting schedulato.

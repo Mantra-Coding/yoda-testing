@@ -1,9 +1,11 @@
 
 import { db } from "@/firebase/firebase";
-import { getDocs, getDoc, collection, doc, addDoc } from "firebase/firestore";
+import { getDocs, getDoc, collection, doc, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import {acceptNotificationMentorship, removeNotificationMentorship} from "@/dao/notificaDAO";
+
 
 const mentorshipSessionCollectionRef = collection(db, 'mentorship_session');
-
+const usersCollectionRef = collection(db, 'utenti');
 /**
  * Recupera una sessione di mentorship per ID.
  *
@@ -18,11 +20,21 @@ export async function fetchMentorship(userId) {
     try {
         const mentorshipSnapshot = await getDocs(mentorshipSessionCollectionRef);
         const sessions = mentorshipSnapshot.docs
-            .map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }))
-            .filter(session => session.mentore === userId || session.mentee === userId); // Filtra per ID utente
+            .map(doc => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    mentoreId: data.mentoreId,
+                    mentoreNome: data.mentoreNome,
+                    mentoreCognome: data.mentoreCognome,
+                    menteeId: data.menteeId,
+                    menteeNome: data.menteeNome,
+                    menteeCognome: data.menteeCognome,
+                    stato: data.stato,
+                    createdAt: data.createdAt
+                };
+            })
+            .filter(session => session.mentoreId === userId || session.menteeId === userId); // Filtra per ID utente
         
         console.log("Sessioni di mentorship trovate:", sessions);
         return sessions;
@@ -32,6 +44,19 @@ export async function fetchMentorship(userId) {
     }
 }
 
+export async function closeMentorshipSession(sessionId) {
+    try {
+        const sessionRef = doc(mentorshipSessionCollectionRef, sessionId);
+        const meeting = await getById(sessionId);
+        await updateDoc(sessionRef, { stato: "Inattivo" });
+        console.log(`Sessione di mentorship ${sessionId} chiusa con successo.`);
+        await removeNotificationMentorship (meeting.mentoreId,meeting.menteeId,meeting.mentoreNome,meeting.mentoreCognome);
+        await deleteDoc(sessionRef);
+    } catch (error) {
+        console.error("Errore nella chiusura della sessione di mentorship:", error);
+        throw error;
+    }
+}
 
 
 export async function getById(mentorshipId) {
@@ -63,23 +88,39 @@ export async function getById(mentorshipId) {
  */
 export async function initializeMentorship(mentorId, menteeId) {
     try {
+        // Recupera i dati del mentore
+        const mentorDoc = await getDoc(doc(usersCollectionRef, mentorId));
+        const mentorData = mentorDoc.exists() ? mentorDoc.data() : null;
+
+        // Recupera i dati del mentee
+        const menteeDoc = await getDoc(doc(usersCollectionRef, menteeId));
+        const menteeData = menteeDoc.exists() ? menteeDoc.data() : null;
+
+        if (!mentorData || !menteeData) {
+            throw new Error("Mentore o Mentee non trovati nel database.");
+        }
+
+        // Creazione dell'oggetto mentorship con nome e cognome
         const mentorship = {
-            mentore: mentorId,
+            mentoreId: mentorId,
+            mentoreNome: mentorData.nome,
+            mentoreCognome: mentorData.cognome,
+            menteeId: menteeId,
+            menteeNome: menteeData.nome,
+            menteeCognome: menteeData.cognome,
             stato: "Attiva",
-            mentee: menteeId,
-            createdAt: new Date() // Aggiungi una data di creazione
+            createdAt: new Date(),
         };
 
         const docRef = await addDoc(mentorshipSessionCollectionRef, mentorship);
-        console.log("Mentorship creata con ID:", docRef.id); // Log dell'ID generato
-
-        return docRef.id; // Restituisce l'ID del documento creato
+        console.log("Mentorship creata con ID:", docRef.id);
+        await acceptNotificationMentorship(mentorship.mentoreId,mentorship.menteeId,mentorship.mentoreNome,mentorship.mentoreCognome);
+        return docRef.id;
     } catch (error) {
         console.error("Errore nella creazione della sessione mentorship", error);
-        throw error; // Propaga l'errore al chiamante
+        throw error;
     }
 }
-
 /**
  * Recupera il mentore da una sessione di mentorship.
  *
