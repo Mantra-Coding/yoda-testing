@@ -26,7 +26,7 @@ import { createNotificationMentorship } from '@/dao/notificaDAO';
 
 
 function DettagliUtente({ user }) {
-  const { userId, nome, cognome} = useAuth();
+  const { userId, nome, cognome, userType} = useAuth();
   const isMentor = user.userType === "mentor";
   const ownPage = userId === user.id;
   const [successMessage, setSuccessMessage] = useState(""); // Stato per il messaggio di successo
@@ -214,6 +214,7 @@ async function handleRichiestaMentorship(user) {
 
 
             {/* Azione finale */}
+            {!ownPage && userType === 'mentee' && (
             <div className="mt-6 flex justify-end">
               <Button className="bg-[#178563] text-white hover:bg-[#178563]/90" onClick={() => handleClick()}>
                 {ownPage
@@ -223,6 +224,7 @@ async function handleRichiestaMentorship(user) {
                     : "Contatta il Mentee"}
               </Button>
             </div>
+            )}
           </CardContent>
         </Card>
       </main>
