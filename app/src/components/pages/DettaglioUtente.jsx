@@ -26,7 +26,7 @@ import { createNotificationMentorship } from '@/dao/notificaDAO';
 
 
 function DettagliUtente({ user }) {
-  const { userId } = useAuth();
+  const { userId, nome, cognome} = useAuth();
   const isMentor = user.userType === "mentor";
   const ownPage = userId === user.id;
   const [successMessage, setSuccessMessage] = useState(""); // Stato per il messaggio di successo
@@ -35,7 +35,7 @@ function DettagliUtente({ user }) {
   // Funzione che gestisce la richiesta di mentorship
 async function handleRichiestaMentorship(user) {
   try {
-    createNotificationMentorship(userId, user.id, user.nome, user.cognome);
+    createNotificationMentorship(userId, user.id, nome, cognome);
     setSuccessMessage("Notifica inviata con successo!");
     setTimeout(() => setSuccessMessage(""), 3000); // Nasconde il messaggio dopo 3 secondi
 

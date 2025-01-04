@@ -50,7 +50,9 @@ export default function NotificationsPage() {
     }
   }; */
   const createMentorship = (notification) => {
-    initializeMentorship(notification.mittente, notification.destinatario);
+    initializeMentorship(notification.destinatario, notification.mittente);
+    handleMarkAsRead(notification.id);  
+  
   };
 
   return (

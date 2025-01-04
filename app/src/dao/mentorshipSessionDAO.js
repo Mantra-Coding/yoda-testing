@@ -114,7 +114,7 @@ export async function initializeMentorship(mentorId, menteeId) {
 
         const docRef = await addDoc(mentorshipSessionCollectionRef, mentorship);
         console.log("Mentorship creata con ID:", docRef.id);
-        await acceptNotificationMentorship(mentorship.mentoreId,mentorship.menteeId,mentorship.mentoreNome,mentorship.mentoreCognome);
+        await acceptNotificationMentorship(mentorship.mentoreId, mentorship.menteeId, mentorship.mentoreNome, mentorship.mentoreCognome);
         return docRef.id;
     } catch (error) {
         console.error("Errore nella creazione della sessione mentorship", error);
