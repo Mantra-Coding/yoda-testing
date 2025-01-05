@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Error404 from "./components/pages/Error404";
 import Error500 from "./components/pages/Error500";
 import Error403 from "./components/pages/Error403";
-import populateDatabase from "./components/ui/populateFirebase"; // Importa la funzione di popolamento
+import populateDatabase from "./populateFirebase"; // Importa la funzione di popolamento
 
 const App = () => {
   useEffect(() => {

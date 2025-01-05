@@ -1,11 +1,10 @@
-import { getFirestore, setDoc, doc, getDoc } from "firebase/firestore";
+import { getFirestore, setDoc, doc, getDoc, connectFirestoreEmulator } from "firebase/firestore";
 import { app } from "@/Firebase/firebase"; // Importa la configurazione Firebase
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import fs from "fs"; // Modulo per leggere file locali
-import path from "path"; // Modulo per gestire i percorsi
+import { getStorage, ref, uploadBytes, getDownloadURL,  connectStorageEmulator} from "firebase/storage";
 
 // Ottieni Firestore
 const db = getFirestore(app);
+connectFirestoreEmulator(db, "localhost", 8080);
 
 
 // Funzione per caricare un file locale su Firebase Storage Emulator e ottenere l'URL
@@ -13,15 +12,11 @@ async function uploadLocalFileToEmulator(storagePath, localFilePath) {
     try {
         // Ottieni il riferimento al servizio di storage
         const storage = getStorage(app);
-        
+        connectStorageEmulator(storage, "localhost", 9199);
         // Configura il collegamento agli emulatori (deve essere fatto prima di utilizzare lo storage)
         
-            storage.useEmulator("localhost", 9199); // Imposta l'indirizzo e la porta dell'emulatore
-        
-
-        const fileData = fs.readFileSync(localFilePath); // Leggi il file dal percorso locale
         const storageRef = ref(storage, storagePath); // Crea un riferimento nel storage
-        const snapshot = await uploadBytes(storageRef, fileData); // Carica il file
+        const snapshot = await uploadBytes(storageRef, localFilePath); // Carica il file
         const downloadURL = await getDownloadURL(snapshot.ref); // Ottieni l'URL del file
         return downloadURL;
     } catch (error) {
@@ -310,7 +305,7 @@ async function populateDatabase() {
                 description: "Guida all'intelligenza artificiale per principianti",
                 thumbnail: "default-thumbnail-url",
                 title: "AI for Beginners",
-                videoUrl: "../videos/Video6- Intelligenza Artificiale.mp4",
+                videoUrl: "Video6- Intelligenza Artificiale.mp4",
             },
         },
         {
@@ -319,7 +314,7 @@ async function populateDatabase() {
                 description: "Introduzione alla programmazione in Python",
                 thumbnail: "default-thumbnail-url",
                 title: "Python Programming Basics",
-                videoUrl: "../videos/Video7- Phyton.mp4",
+                videoUrl: "Video7- Phyton.mp4",
             },
         },
         {
@@ -328,7 +323,7 @@ async function populateDatabase() {
                 description: "Corso completo su Data Science con Python",
                 thumbnail: "default-thumbnail-url",
                 title: "Data Science with Python",
-                videoUrl: "../videos/Video8- DataScience.mp4",
+                videoUrl: "Video8- DataScience.mp4",
             },
         },
         {
@@ -337,7 +332,7 @@ async function populateDatabase() {
                 description: "Come sviluppare applicazioni con React",
                 thumbnail: "default-thumbnail-url",
                 title: "React for Developers",
-                videoUrl: "../videos/Video9- React.mp4",
+                videoUrl: "Video9- React.mp4",
             },
         },
         {
@@ -346,7 +341,7 @@ async function populateDatabase() {
                 description: "Fondamenti di Cloud Computing con AWS",
                 thumbnail: "default-thumbnail-url",
                 title: "Cloud Computing Essentials with AWS",
-                videoUrl: "../videos/Video10- Cloud Computing.mp4",
+                videoUrl: "Video10- Cloud Computing.mp4",
             },
         }
         ];
@@ -614,7 +609,8 @@ async function populateDatabase() {
                 await setDoc(doc(db, collection.name, item.id), item.data);
             }
         }
-
+        uploadVideosToEmulators(videos, "./videos/")
+        uploadDocumentsToEmulators(authors, "./Documents/")
         // Segna il database come popolato
         await setDoc(checkDoc, { populated: true, date: new Date() });
 
@@ -627,11 +623,10 @@ async function populateDatabase() {
   // Funzione per caricare i video su Firebase Storage Emulator e aggiornare Firestore Emulator
   async function uploadVideosToEmulators(videos, videosBasePath) {
     try {
-        const firestore = getFirestore();
-        firestore.useEmulator("localhost", 8080); // Configura l'emulatore di Firestore
 
         for (const video of videos) {
-            const localVideoPath = path.join(videosBasePath, video.data.videoUrl);
+            if (!video.data.videoUrl.includes('https')){
+            const localVideoPath = videosBasePath + video.data.videoUrl;
             const storagePath = `videos/${video.data.videoUrl}`;
             const videoUrl = await uploadLocalFileToEmulator(storagePath, localVideoPath);
 
@@ -639,9 +634,10 @@ async function populateDatabase() {
                 video.data.videoUrl = videoUrl; // Aggiorna l'URL con quello su Firebase Storage Emulator
                 
                 // Salva l'aggiornamento su Firestore Emulator
-                const videoDocRef = doc(firestore, "videos", video.id); // Crea un riferimento al documento
+                const videoDocRef = doc(db, "videos", video.id); // Crea un riferimento al documento
                 await setDoc(videoDocRef, video.data); // Aggiorna i dati su Firestore Emulator
             }
+        }
         }
     } catch (error) {
         console.error("Errore durante il caricamento dei video sugli emulatori:", error);
@@ -651,11 +647,9 @@ async function populateDatabase() {
 // Funzione per caricare i documenti su Firebase Storage Emulator e aggiornare Firestore Emulator
 async function uploadDocumentsToEmulators(authors, documentsBasePath) {
     try {
-        const firestore = getFirestore();
-        firestore.useEmulator("localhost", 8080); // Configura l'emulatore di Firestore
 
         for (const author of authors) {
-            const localDocPath = path.join(documentsBasePath, author.data.filePath);
+            const localDocPath = documentsBasePath + author.data.filePath;
             const storagePath = `documents/${author.data.filePath}`;
             const fileUrl = await uploadLocalFileToEmulator(storagePath, localDocPath);
 
@@ -663,7 +657,7 @@ async function uploadDocumentsToEmulators(authors, documentsBasePath) {
                 author.data.filePath = fileUrl; // Aggiorna l'URL con quello su Firebase Storage Emulator
                 
                 // Salva l'aggiornamento su Firestore Emulator
-                const authorDocRef = doc(firestore, "authors", author.id); // Crea un riferimento al documento
+                const authorDocRef = doc(db, "authors", author.id); // Crea un riferimento al documento
                 await setDoc(authorDocRef, author.data); // Aggiorna i dati su Firestore Emulator
             }
         }
