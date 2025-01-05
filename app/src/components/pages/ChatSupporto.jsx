@@ -61,34 +61,36 @@ export default function ChatSupporto() {
   
   
 //Secondo useEffect serve per visualizzare i messaggi
-  useEffect(() => {
-    const fetchMessages = async () => {
-      if (!mentorId) {
-        console.error("Mentor ID non disponibile per i messaggi.");
-        setError("Mentor ID non disponibile per i messaggi.");
-        return;
+useEffect(() => {
+  const fetchMessages = async () => {
+    if (!mentorId) {
+      console.error("Mentor ID non disponibile per i messaggi.");
+      setError("Mentor ID non disponibile per i messaggi.");
+      return;
+    }
+
+    setLoading(true); // Mostra il caricamento
+    try {
+      const chatId = `${userId}_${mentorId}`; // Genera l'ID unico della chat
+      const fetchedMessages = await getSupportMessages(chatId); // Usa il chatId univoco
+
+      if (fetchedMessages && fetchedMessages.length > 0) {
+        setMessages(fetchedMessages); // Salva i messaggi nello stato
+      } else {
+        console.warn("Nessun messaggio trovato.");
+        setMessages([]); // Resetta i messaggi
       }
-  
-      setLoading(true); // Mostra il caricamento
-      try {
-        const fetchedMessages = await getSupportMessages(mentorId); // Passa il mentorId per filtrare
-        if (fetchedMessages && fetchedMessages.length > 0) {
-          setMessages(fetchedMessages); // Salva i messaggi nello stato
-        } else {
-          console.warn("Nessun messaggio trovato.");
-          setMessages([]); // Resetta i messaggi
-        }
-      } catch (err) {
-        console.error("Errore durante il recupero dei messaggi:", err);
-        setError("Errore durante il recupero dei messaggi.");
-      } finally {
-        setLoading(false); // Nascondi il caricamento
-      }
-    };
-  
-    fetchMessages(); // Chiamata al caricamento dei messaggi
-  }, [mentorId]); // Si attiva quando `mentorId` cambia
-  
+    } catch (err) {
+      console.error("Errore durante il recupero dei messaggi:", err);
+      setError("Errore durante il recupero dei messaggi.");
+    } finally {
+      setLoading(false); // Nascondi il caricamento
+    }
+  };
+
+  fetchMessages(); // Chiamata al caricamento dei messaggi
+}, [mentorId]); // Si attiva quando `mentorId` cambia
+
 //Use effect per il controllo mentore/mentee
 useEffect(() => {
   const fetchMenteeDetails = async () => {
@@ -121,48 +123,50 @@ useEffect(() => {
 
 
 
-  const handleSendMessage = async () => {
-    if (!message.trim()) {
-      console.warn("Messaggio vuoto non inviato.");
-      return;
-    }
-  
-    const newMessage = {
-      chatId: mentorId, // Usa l'ID della chat esistente o generato
-      senderId: userId, // ID dell'utente che invia il messaggio
-      text: message,
-      timestamp: Date.now(),
-    };
-  
-    try {
-      // Determina il ruolo dell'utente corrente
-      const menteeId = userType === "mentee" ? userId : mentorId; // Se è un mentee, il suo ID è il `userId`
-      const mentorIdFinal = userType === "mentor" ? userId : mentorId; // Se è un mentore, il suo ID è il `userId`
-  
-      // Recupera i nomi corretti
-      const menteeName =
-        userType === "mentee"
-          ? `${user?.nome || "Mentee"} ${user?.cognome || "Sconosciuto"}`
-          : "";
-      const mentorName =
-        userType === "mentor"
-          ? `${user?.nome || "Mentore"} ${user?.cognome || "Sconosciuto"}`
-          : "";
-  
-      // Crea la chat solo se necessario
-      await createChat(mentorId, menteeId, menteeName, mentorIdFinal, mentorName);
-  
-      // Invia il messaggio
-      await sendSupportMessage(newMessage);
-  
-      // Aggiorna i messaggi nella chat
-      setMessages((prev) => [...prev, newMessage]);
-      setMessage("");
-    } catch (err) {
-      console.error("Errore durante l'invio del messaggio:", err);
-      setError("Errore durante l'invio del messaggio.");
-    }
+const handleSendMessage = async () => {
+  if (!message.trim()) {
+    console.warn("Messaggio vuoto non inviato.");
+    return;
+  }
+
+  const chatId = `${userId}_${mentorId}`; // Genera un ID unico basato su menteeId e mentorId
+  const newMessage = {
+    chatId, // Usa l'ID univoco della chat
+    senderId: userId, // ID dell'utente che invia il messaggio
+    text: message,
+    timestamp: Date.now(),
   };
+
+  try {
+    // Determina il ruolo dell'utente corrente
+    const menteeId = userType === "mentee" ? userId : mentorId; // Se è un mentee, il suo ID è il `userId`
+    const mentorIdFinal = userType === "mentor" ? userId : mentorId; // Se è un mentore, il suo ID è il `userId`
+
+    // Recupera i nomi corretti
+    const menteeName =
+      userType === "mentee"
+        ? `${user?.nome || "Mentee"} ${user?.cognome || "Sconosciuto"}`
+        : "";
+    const mentorName =
+      userType === "mentor"
+        ? `${user?.nome || "Mentore"} ${user?.cognome || "Sconosciuto"}`
+        : "";
+
+    // Crea la chat solo se necessario
+    await createChat(menteeId, mentorId, menteeName, mentorName);
+
+    // Invia il messaggio
+    await sendSupportMessage(newMessage);
+
+    // Aggiorna i messaggi nella chat
+    setMessages((prev) => [...prev, newMessage]);
+    setMessage("");
+  } catch (err) {
+    console.error("Errore durante l'invio del messaggio:", err);
+    setError("Errore durante l'invio del messaggio.");
+  }
+};
+
   
   
   
@@ -307,3 +311,6 @@ useEffect(() => {
     </div>
   );
 }
+
+
+

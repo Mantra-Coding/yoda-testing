@@ -24,8 +24,8 @@ export async function getChatsByUserId(userId) {
     }
 
     const chats = [];
-    for (const doc of chatsSnapshot.docs) {
-      const chatData = doc.data();
+    for (const chatDoc of chatsSnapshot.docs) { // Modificato: chatDoc invece di doc
+      const chatData = chatDoc.data();
 
       console.log("Chat trovata:", chatData);
 
@@ -49,7 +49,7 @@ export async function getChatsByUserId(userId) {
         }
       }
 
-      chats.push({ id: doc.id, ...chatData });
+      chats.push({ id: chatDoc.id, ...chatData }); // Modificato: chatDoc.id invece di doc.id
     }
 
     console.log("Chat elaborate:", chats);
@@ -89,48 +89,31 @@ export async function getSupportMessages(chatId) {
   }
 }
 
+
 // Invia un messaggio alla chat
 export async function sendSupportMessage(message) {
   try {
+    // Aggiungi il messaggio alla raccolta dei messaggi
     await addDoc(supportMessagesCollection, message);
     console.log("Messaggio inviato:", message);
 
+    // Recupera il riferimento alla chat
     const chatDocRef = doc(db, "supportChat", message.chatId);
     const chatDoc = await getDoc(chatDocRef);
 
+    // Verifica che la chat esista
     if (!chatDoc.exists()) {
-      console.error("La chat non esiste. Non dovrebbe succedere.");
+      console.error("La chat non esiste. Creazione non riuscita.");
       return;
     }
 
-    const chatData = chatDoc.data();
-
-    // Recupera i dettagli del mentee, se mancanti
-    if (!chatData.menteeName || chatData.menteeName.includes("Sconosciuto")) {
-      const menteeDocRef = doc(db, "utenti", chatData.menteeId);
-      const menteeDoc = await getDoc(menteeDocRef);
-      if (menteeDoc.exists()) {
-        const menteeData = menteeDoc.data();
-        chatData.menteeName = `${menteeData.nome || "Mentee"} ${menteeData.cognome || "Sconosciuto"}`;
-      }
-    }
-
-    // Recupera i dettagli del mentore, se mancanti
-    if (!chatData.mentorName || chatData.mentorName.includes("Sconosciuto")) {
-      const mentorDocRef = doc(db, "utenti", chatData.mentorId);
-      const mentorDoc = await getDoc(mentorDocRef);
-      if (mentorDoc.exists()) {
-        const mentorData = mentorDoc.data();
-        chatData.mentorName = `${mentorData.nome || "Mentore"} ${mentorData.cognome || "Sconosciuto"}`;
-      }
-    }
-
+    // Aggiorna la chat con le informazioni dell'ultimo messaggio
     await updateDoc(chatDocRef, {
       lastMessage: message.text,
       updatedAt: message.timestamp,
-      menteeName: chatData.menteeName,
-      mentorName: chatData.mentorName,
     });
+
+    console.log("Chat aggiornata con l'ultimo messaggio:", message.text);
   } catch (err) {
     console.error("Errore durante l'invio del messaggio di supporto:", err);
     throw new Error("Impossibile inviare il messaggio.");
@@ -139,43 +122,38 @@ export async function sendSupportMessage(message) {
 
 
 
+
+
 // Crea una nuova chat
-export async function createChat(chatId, menteeId, menteeName, mentorId, mentorName) {
+function generateChatId(menteeId, mentorId) {
+  return `${menteeId}_${mentorId}`; // Genera ID univoco per la chat
+}
+
+export async function createChat(menteeId, mentorId, menteeName, mentorName) {
   try {
+    const chatId = generateChatId(menteeId, mentorId);
     console.log("Dati ricevuti da createChat:", { chatId, menteeId, menteeName, mentorId, mentorName });
 
-    if (!menteeId || !mentorId || menteeId === mentorId) {
-      throw new Error("ID mentee e ID mentore devono essere distinti e validi.");
+    const chatDocRef = doc(db, "supportChat", chatId);
+    const chatDoc = await getDoc(chatDocRef);
+
+    if (!chatDoc.exists()) {
+      const newChat = {
+        chatId,
+        menteeId,
+        menteeName,
+        mentorId,
+        mentorName,
+        participants: [menteeId, mentorId],
+        lastMessage: "",
+        updatedAt: Date.now(),
+      };
+
+      await setDoc(chatDocRef, newChat);
+      return { success: true, id: chatId };
+    } else {
+      return { success: true, id: chatId };
     }
-
-    // Recupera i dettagli del mentee
-    const menteeDocRef = doc(db, "utenti", menteeId);
-    const menteeDoc = await getDoc(menteeDocRef);
-    const menteeData = menteeDoc.exists() ? menteeDoc.data() : {};
-    const finalMenteeName = menteeName || `${menteeData.nome || "Mentee"} ${menteeData.cognome || "Sconosciuto"}`;
-
-    // Recupera i dettagli del mentore
-    const mentorDocRef = doc(db, "utenti", mentorId);
-    const mentorDoc = await getDoc(mentorDocRef);
-    const mentorData = mentorDoc.exists() ? mentorDoc.data() : {};
-    const finalMentorName = mentorName || `${mentorData.nome || "Mentore"} ${mentorData.cognome || "Sconosciuto"}`;
-
-    const newChat = {
-      chatId,
-      menteeId,
-      menteeName: finalMenteeName,
-      mentorId,
-      mentorName: finalMentorName,
-      participants: [menteeId, mentorId],
-      lastMessage: "",
-      updatedAt: Date.now(),
-    };
-
-    const docRef = doc(db, "supportChat", chatId);
-    await setDoc(docRef, newChat);
-
-    console.log("Chat creata con successo:", newChat);
-    return { success: true, id: chatId };
   } catch (err) {
     console.error("Errore durante la creazione della chat:", err);
     return { success: false, error: "Impossibile creare la chat." };
