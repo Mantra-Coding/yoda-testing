@@ -122,6 +122,22 @@ export async function createChat(menteeId, mentorId, menteeName, mentorName) {
       throw new Error("Mentee ID o Mentor ID mancante.");
     }
 
+    // Recupera il nome e cognome del mentee
+    const menteeDocRef = doc(db, "utenti", menteeId);
+    const menteeDoc = await getDoc(menteeDocRef);
+    if (menteeDoc.exists()) {
+      const menteeData = menteeDoc.data();
+      menteeName = `${menteeData.nome || "Mentee"} ${menteeData.cognome || "Sconosciuto"}`;
+    }
+
+    // Recupera il nome e cognome del mentore
+    const mentorDocRef = doc(db, "utenti", mentorId);
+    const mentorDoc = await getDoc(mentorDocRef);
+    if (mentorDoc.exists()) {
+      const mentorData = mentorDoc.data();
+      mentorName = `${mentorData.nome || "Mentore"} ${mentorData.cognome || "Sconosciuto"}`;
+    }
+
     // Verifica se una chat esiste già tra i partecipanti
     const chatsQuery = query(
       supportCollection,
@@ -168,3 +184,4 @@ export async function createChat(menteeId, mentorId, menteeName, mentorName) {
     return { success: false, error: "Impossibile creare la chat." };
   }
 }
+

@@ -4,6 +4,8 @@ import { createChat, sendSupportMessage, getSupportMessages } from "@/dao/chatSu
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardHeader } from "@/components/ui/card";
 import Header from "@/components/ui/Header";
+import { doc, getDoc } from "firebase/firestore";
+
 
 export default function ChatSupporto() {
   const location = useLocation();
@@ -111,7 +113,12 @@ export default function ChatSupporto() {
           <>
             <Card className="w-full bg-[#f8f9fa] mb-4 rounded-lg p-4 shadow-sm">
               <CardHeader>
-                <h2 className="text-xl font-bold text-[#178563]">Chat con il mentore</h2>
+              <h2 className="text-xl font-bold text-[#178563]">
+  {userType === "mentor"
+    ? `Chat con il ${location.state?.menteeName || "Mentee"}`
+    : `Chat con il ${location.state?.mentorName || "Mentore"}`}
+</h2>
+
                 {problemType && problemType !== "Non specificato" && (
                   <p className="text-gray-600">
                     Stai discutendo del problema : {problemType}
