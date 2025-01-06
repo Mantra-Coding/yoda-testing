@@ -1,28 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/auth/auth-context";
+import app from "@/firebase/firebase";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { createChat, sendSupportMessage, getSupportMessages } from "@/dao/chatSupportoDAO";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardHeader } from "@/components/ui/card";
 import Header from "@/components/ui/Header";
-import { doc, getDoc } from "firebase/firestore";
 
+const db = getFirestore(app);
 
 export default function ChatSupporto() {
   const location = useLocation();
   const navigate = useNavigate();
   const { chatId, mentorId, problemType } = location.state || {}; // Aggiunto chatId
-  const { userId, userType, nome, cognome } = useAuth(); // Importa solo le variabili richieste
+  const { userId, userType } = useAuth(); // Importa solo le variabili richieste
+
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [menteeName, setMenteeName] = useState("Mentee Sconosciuto");
+  const [mentorName, setMentorName] = useState("Mentore Sconosciuto");
 
   if (!userId) {
     console.error("Utente non autenticato.");
     navigate("/login");
     return null;
   }
-
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const initChat = async () => {
@@ -38,11 +42,8 @@ export default function ChatSupporto() {
           const menteeId = userType === "mentee" ? userId : mentorId;
           const mentorIdFinal = userType === "mentor" ? userId : mentorId;
 
-          const menteeName = `${nome || "Mentee"} ${cognome || "Sconosciuto"}`;
-          const mentorName = "Mentore Sconosciuto";
-
           // Creazione della chat
-          const createChatResponse = await createChat(menteeId, mentorIdFinal, menteeName, mentorName);
+          const createChatResponse = await createChat(menteeId, mentorIdFinal, "", "");
           if (!createChatResponse.success) {
             throw new Error("Errore nella creazione della chat.");
           }
@@ -52,8 +53,19 @@ export default function ChatSupporto() {
           });
           return;
         }
-        if (problemType)
+
+        // Recupera i dettagli della chat
+        const chatDocRef = doc(db, "supportChat", chatId);
+        const chatDoc = await getDoc(chatDocRef);
+        if (chatDoc.exists()) {
+          const chatData = chatDoc.data();
+          setMenteeName(chatData.menteeName || "Mentee Sconosciuto");
+          setMentorName(chatData.mentorName || "Mentore Sconosciuto");
+        }
+
+        if (problemType) {
           setMessage("Ciao, ti contatto per il seguente problema: " + problemType);
+        }
 
         // Recupera i messaggi salvati
         const savedMessages = await getSupportMessages(chatId);
@@ -67,7 +79,7 @@ export default function ChatSupporto() {
     };
 
     initChat();
-  }, [chatId, mentorId, userId, userType, nome, cognome, navigate, problemType]);
+  }, [chatId, mentorId, userId, userType, navigate, problemType]);
 
   const handleSendMessage = async () => {
     if (!message.trim() || !chatId) {
@@ -113,15 +125,13 @@ export default function ChatSupporto() {
           <>
             <Card className="w-full bg-[#f8f9fa] mb-4 rounded-lg p-4 shadow-sm">
               <CardHeader>
-              <h2 className="text-xl font-bold text-[#178563]">
-  {userType === "mentor"
-    ? `Chat con il ${location.state?.menteeName || "Mentee"}`
-    : `Chat con il ${location.state?.mentorName || "Mentore"}`}
-</h2>
+                <h2 className="text-xl font-bold text-[#178563]">
+                  {userType === "mentor" ? `Chat con ${menteeName}` : `Chat con ${mentorName}`}
+                </h2>
 
                 {problemType && problemType !== "Non specificato" && (
                   <p className="text-gray-600">
-                    Stai discutendo del problema : {problemType}
+                    Stai discutendo del problema: {problemType}
                   </p>
                 )}
               </CardHeader>
