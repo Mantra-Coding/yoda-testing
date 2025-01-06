@@ -110,12 +110,24 @@ export default function SupportPage() {
                     Visualizza Mentore
                   </Button>
                   <Button
-                className="w-full mt-2 bg-blue-600 hover:bg-blue-700"
-                onClick={() => {
-                  navigate(`/chat-support/${mentor.id}?problemType=${selectedProblem}`); // Passa il tipo di supporto come query parameter
-                }}
-                disabled={!selectedProblem} // Disabilita se nessun problema è selezionato
-              >
+      className="w-full mt-2 bg-blue-600 hover:bg-blue-700"
+      onClick={() => {
+        if (!selectedProblem) {
+          console.warn("Devi selezionare un problema prima di contattare un mentore.");
+          return;
+        }
+    
+        if (!mentor.id) {
+          console.error("Mentor ID non disponibile.");
+          return;
+        }
+    
+        navigate("/chat-support", {
+          state: { mentorId: mentor.id, problemType: selectedProblem }, // Passa mentorId e problemType come stato
+        });
+      }}
+      disabled={!selectedProblem} // Disabilita se nessun problema è selezionato
+    >
                     Contatta Mentore
                   </Button>
                 </CardContent>

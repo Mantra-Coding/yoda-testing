@@ -15,7 +15,7 @@ import app from "@/firebase/firebase";
 const db = getFirestore(app);
 
 export default function ChatListPage() {
-  const { userId, userType } = useAuth();
+  const { userId, userType } = useAuth(); // Implementazione dell'auth-context
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -111,7 +111,10 @@ export default function ChatListPage() {
                       ? "border-[#22A699] border-2"
                       : "border-gray-200"
                   } hover:bg-gray-100 hover:scale-105`}
-                  onClick={() => navigate(`/chat-support/${chat.chatId}`)}
+                  onClick={() => navigate("/chat-support", {
+                    state: { chatId: chat.id, mentorId: chat.mentorId, problemType: "" }
+                  })}
+                  
                 >
                   {/* Profilo con iniziali */}
                   <div className="relative">

@@ -1,4 +1,4 @@
-import {getFirestore,  collection,  where, query,  getDocs, addDoc,  orderBy, doc,  updateDoc,  setDoc,  getDoc, } from "firebase/firestore";
+import { getFirestore, collection, where, query, getDocs, addDoc, orderBy, doc, updateDoc, setDoc, getDoc } from "firebase/firestore";
 import app from "@/firebase/firebase";
 
 const db = getFirestore(app);
@@ -6,7 +6,7 @@ const supportCollection = collection(db, "supportChat");
 const supportMessagesCollection = collection(db, "supportChatMessages");
 
 // Recupera le chat di un utente
-export async function getChatsByUserId(userId) {
+export async function getChatsByUserId(userId, userType) {
   try {
     console.log("Tentativo di recupero chat per l'utente:", userId);
 
@@ -19,18 +19,17 @@ export async function getChatsByUserId(userId) {
     const chatsSnapshot = await getDocs(chatsQuery);
 
     if (chatsSnapshot.empty) {
-      console.log("Nessuna chat trovata per l'utente:", userId);
-      return { success: true, data: [] }; // Ritorna un array vuoto
+      console.warn("Nessuna chat trovata per l'utente:", userId);
+      return { success: true, data: [] };
     }
 
     const chats = [];
-    for (const chatDoc of chatsSnapshot.docs) { // Modificato: chatDoc invece di doc
+    for (const chatDoc of chatsSnapshot.docs) {
       const chatData = chatDoc.data();
-
       console.log("Chat trovata:", chatData);
 
       // Recupera i dettagli del mentee
-      if (!chatData.menteeName || chatData.menteeName.includes("Sconosciuto")) {
+      if (chatData.menteeId) {
         const menteeDocRef = doc(db, "utenti", chatData.menteeId);
         const menteeDoc = await getDoc(menteeDocRef);
         if (menteeDoc.exists()) {
@@ -40,7 +39,7 @@ export async function getChatsByUserId(userId) {
       }
 
       // Recupera i dettagli del mentore
-      if (!chatData.mentorName || chatData.mentorName.includes("Sconosciuto")) {
+      if (chatData.mentorId) {
         const mentorDocRef = doc(db, "utenti", chatData.mentorId);
         const mentorDoc = await getDoc(mentorDocRef);
         if (mentorDoc.exists()) {
@@ -49,23 +48,16 @@ export async function getChatsByUserId(userId) {
         }
       }
 
-      chats.push({ id: chatDoc.id, ...chatData }); // Modificato: chatDoc.id invece di doc.id
+      chats.push({ id: chatDoc.id, ...chatData });
     }
 
     console.log("Chat elaborate:", chats);
-
     return { success: true, data: chats };
   } catch (err) {
     console.error("Errore durante il recupero delle chat:", err);
     return { success: false, error: "Errore durante il recupero delle chat." };
   }
 }
-
-
-
-
-
-
 
 // Recupera i messaggi di una chat
 export async function getSupportMessages(chatId) {
@@ -88,7 +80,6 @@ export async function getSupportMessages(chatId) {
     throw new Error("Impossibile recuperare i messaggi.");
   }
 }
-
 
 // Invia un messaggio alla chat
 export async function sendSupportMessage(message) {
@@ -120,10 +111,6 @@ export async function sendSupportMessage(message) {
   }
 }
 
-
-
-
-
 // Crea una nuova chat
 function generateChatId(menteeId, mentorId) {
   return `${menteeId}_${mentorId}`; // Genera ID univoco per la chat
@@ -131,39 +118,53 @@ function generateChatId(menteeId, mentorId) {
 
 export async function createChat(menteeId, mentorId, menteeName, mentorName) {
   try {
+    if (!menteeId || !mentorId) {
+      throw new Error("Mentee ID o Mentor ID mancante.");
+    }
+
+    // Verifica se una chat esiste già tra i partecipanti
+    const chatsQuery = query(
+      supportCollection,
+      where("participants", "array-contains", menteeId)
+    );
+
+    const chatsSnapshot = await getDocs(chatsQuery);
+
+    let existingChat = null;
+
+    chatsSnapshot.forEach((doc) => {
+      const chatData = doc.data();
+      if (chatData.participants.includes(mentorId)) {
+        existingChat = { id: doc.id, ...chatData };
+      }
+    });
+
+    if (existingChat) {
+      console.log("Chat già esistente:", existingChat);
+      return { success: true, id: existingChat.chatId };
+    }
+
+    // Se la chat non esiste, creane una nuova
     const chatId = generateChatId(menteeId, mentorId);
-    console.log("Dati ricevuti da createChat:", { chatId, menteeId, menteeName, mentorId, mentorName });
+    console.log("Creazione chat con ID:", chatId);
+
+    const newChat = {
+      chatId,
+      menteeId,
+      menteeName,
+      mentorId,
+      mentorName,
+      participants: [menteeId, mentorId],
+      lastMessage: "",
+      updatedAt: Date.now(),
+    };
 
     const chatDocRef = doc(db, "supportChat", chatId);
-    const chatDoc = await getDoc(chatDocRef);
+    await setDoc(chatDocRef, newChat);
 
-    if (!chatDoc.exists()) {
-      const newChat = {
-        chatId,
-        menteeId,
-        menteeName,
-        mentorId,
-        mentorName,
-        participants: [menteeId, mentorId],
-        lastMessage: "",
-        updatedAt: Date.now(),
-      };
-
-      await setDoc(chatDocRef, newChat);
-      return { success: true, id: chatId };
-    } else {
-      return { success: true, id: chatId };
-    }
+    return { success: true, id: chatId };
   } catch (err) {
     console.error("Errore durante la creazione della chat:", err);
     return { success: false, error: "Impossibile creare la chat." };
   }
 }
-
-
-
-
-
-
-
-
