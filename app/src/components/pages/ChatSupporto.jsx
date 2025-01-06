@@ -3,6 +3,7 @@ import { useAuth } from "@/auth/auth-context";
 import { createChat, sendSupportMessage, getSupportMessages } from "@/dao/chatSupportoDAO";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardHeader } from "@/components/ui/card";
+import Header from "@/components/ui/Header";
 
 export default function ChatSupporto() {
   const location = useLocation();
@@ -49,8 +50,8 @@ export default function ChatSupporto() {
           });
           return;
         }
-        if(problemType)
-setMessage("Ciao, ti contatto per il seguente problema: " +problemType);
+        if (problemType)
+          setMessage("Ciao, ti contatto per il seguente problema: " + problemType);
 
         // Recupera i messaggi salvati
         const savedMessages = await getSupportMessages(chatId);
@@ -100,6 +101,9 @@ setMessage("Ciao, ti contatto per il seguente problema: " +problemType);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#178563] to-[#edf2f7]">
+      {/* Inserimento dell'header */}
+      <Header />
+
       <div className="container mx-auto py-6 space-y-6 text-white">
         {loading ? (
           <div>Caricamento...</div>
@@ -107,15 +111,12 @@ setMessage("Ciao, ti contatto per il seguente problema: " +problemType);
           <>
             <Card className="w-full bg-[#f8f9fa] mb-4 rounded-lg p-4 shadow-sm">
               <CardHeader>
-                <h2 className="text-xl font-bold text-[#178563]">
-                  Chat con il mentore
-                </h2>
-                 {problemType && problemType !== "Non specificato" && (
-                <p className="text-gray-600">
-                 
-                     Stai discutendo del problema : {problemType}
-                
-                </p>)}
+                <h2 className="text-xl font-bold text-[#178563]">Chat con il mentore</h2>
+                {problemType && problemType !== "Non specificato" && (
+                  <p className="text-gray-600">
+                    Stai discutendo del problema : {problemType}
+                  </p>
+                )}
               </CardHeader>
             </Card>
 
