@@ -112,7 +112,7 @@ export async function createNotification(mittenteId, destinatarioId, oggetto, co
      * @property {Date} scadenza - Data di scadenza della notifica (24 ore dopo la creazione).
      */
     const timeStamp = new Date();
-    const expirationTime = 60 * 1000; // 24 ore in millisecondi
+    const expirationTime =  30 *24 * 60 * 60 * 1000; // 30 giorni in millisecondi
     const expirationDate = new Date(timeStamp.getTime() + expirationTime); // Data di scadenza
 
     const newNotification = {
