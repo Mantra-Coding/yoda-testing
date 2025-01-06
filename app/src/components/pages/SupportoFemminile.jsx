@@ -70,8 +70,13 @@ export default function SupportoFemminile() {
                     <div className="space-y-4">
                       <h4 className="font-semibold text-emerald-700">Competenze:</h4>
                       <p className="text-sm text-gray-600">{mentore.competenze || "Non specificato"}</p>
-                      <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
-                        Invia richiesta di mentorship
+                      <Button
+                        className="w-full bg-emerald-600 hover:bg-emerald-700"
+                        onClick={() => {
+                          window.location.href = `/dettagli/${mentore.id}`;
+                        }}
+                      >
+                        Visualizza Mentore
                       </Button>
                     </div>
                   </CardContent>

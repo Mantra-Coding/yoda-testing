@@ -1,13 +1,11 @@
-// supportoDAO.js
 import { getFirestore, collection, query, where, getDocs } from "firebase/firestore"; // Assicurati che query sia importato
-
 
 /**
  * Recupera tutti i mentori dal database.
  * @returns {Promise<Object>} - Un oggetto contenente il successo e i dati o l'errore.
  */
 export async function getAllMentors() {
-    const db = getFirestore();
+  const db = getFirestore(); // Definizione corretta della variabile db
   try {
     console.log("Inizio query per recuperare tutti i mentori...");
 
@@ -44,6 +42,7 @@ export async function getAllMentors() {
  * @returns {Promise<Object>} - Un oggetto contenente il successo e i dati o l'errore.
  */
 export async function getMentoriFemmina() {
+  const db = getFirestore(); // Definizione corretta della variabile db
   try {
     console.log("Inizio query per recuperare mentori femmina...");
 
