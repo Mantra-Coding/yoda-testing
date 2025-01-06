@@ -28,6 +28,11 @@ export async function getChatsByUserId(userId, userType) {
       const chatData = chatDoc.data();
       console.log("Chat trovata:", chatData);
 
+      // Controlla che lastMessageSenderId esista
+      if (!chatData.lastMessageSenderId) {
+        console.warn(`La chat ${chatDoc.id} non contiene lastMessageSenderId.`);
+      }
+
       // Recupera i dettagli del mentee
       if (chatData.menteeId) {
         const menteeDocRef = doc(db, "utenti", chatData.menteeId);
@@ -48,6 +53,12 @@ export async function getChatsByUserId(userId, userType) {
         }
       }
 
+      // Calcola isNewMessage direttamente qui
+      const isNewMessage = chatData.lastMessageSenderId && chatData.lastMessageSenderId !== userId;
+      chatData.isNewMessage = isNewMessage;
+
+      console.log(`Chat ${chatDoc.id} - Is New Message: ${isNewMessage}`);
+
       chats.push({ id: chatDoc.id, ...chatData });
     }
 
@@ -58,6 +69,7 @@ export async function getChatsByUserId(userId, userType) {
     return { success: false, error: "Errore durante il recupero delle chat." };
   }
 }
+
 
 // Recupera i messaggi di una chat
 export async function getSupportMessages(chatId) {
@@ -102,14 +114,16 @@ export async function sendSupportMessage(message) {
     await updateDoc(chatDocRef, {
       lastMessage: message.text,
       updatedAt: message.timestamp,
+      lastMessageSenderId: message.senderId, // Aggiunge l'ID del mittente
     });
 
-    console.log("Chat aggiornata con l'ultimo messaggio:", message.text);
+    console.log("Chat aggiornata con l'ultimo messaggio e mittente:", message.text);
   } catch (err) {
     console.error("Errore durante l'invio del messaggio di supporto:", err);
     throw new Error("Impossibile inviare il messaggio.");
   }
 }
+
 
 // Crea una nuova chat
 function generateChatId(menteeId, mentorId) {

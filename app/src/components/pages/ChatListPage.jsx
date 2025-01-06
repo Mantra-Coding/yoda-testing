@@ -3,6 +3,7 @@ import { getChatsByUserId } from "@/dao/chatSupportoDAO";
 import { useAuth } from "@/auth/auth-context";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import Header from "@/components/ui/Header";
 import {
   getFirestore,
   collection,
@@ -59,10 +60,11 @@ export default function ChatListPage() {
     const unsubscribe = onSnapshot(chatsQuery, (snapshot) => {
       const updatedChats = snapshot.docs.map((doc) => {
         const chat = doc.data();
+        const isNewMessage = chat.lastMessageSenderId !== userId;
         return {
           id: doc.id,
           ...chat,
-          isNewMessage: chat.lastMessageSenderId !== userId, // True se l'ultimo messaggio è stato inviato da un altro utente
+          isNewMessage,
         };
       });
       setChats(updatedChats);
@@ -91,6 +93,7 @@ export default function ChatListPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#178563] to-[#edf2f7]">
+      <Header />
       <div className="container mx-auto p-6">
         <h1 className="text-4xl font-bold mb-8 text-white tracking-tight">
           Sezione Chat Di Supporto
@@ -103,21 +106,25 @@ export default function ChatListPage() {
                   ? chat.menteeName || "Mentee Sconosciuto"
                   : chat.mentorName || "Mentore Sconosciuto";
 
+              const isNewMessage = chat.isNewMessage || false;
+
               return (
                 <Card
-                  key={chat.id}
+                  key={`${chat.id}-${isNewMessage}`} // Forza il re-render quando cambia isNewMessage
                   className={`cursor-pointer flex items-center transition-transform transform border rounded-lg p-4 shadow-md bg-white ${
-                    chat.isNewMessage
-                      ? "border-[#22A699] border-2"
-                      : "border-gray-200"
-                  } hover:bg-gray-100 hover:scale-105`}
-                  onClick={() => navigate("/chat-support", {
-                    state: { chatId: chat.id, mentorId: chat.mentorId, problemType: "" }
-                  })}
-                  
+                    isNewMessage ? "border-green-500 hover:border-green-700 border-4 animate-pulse" : "border-gray-200"
+                  } hover:bg-gray-100 hover:scale-105 relative`}
+                  onClick={() =>
+                    navigate("/chat-support", {
+                      state: {
+                        chatId: chat.id,
+                        mentorId: chat.mentorId,
+                        problemType: "",
+                      },
+                    })
+                  }
                 >
-                  {/* Profilo con iniziali */}
-                  <div className="relative">
+                  <div className="relative flex items-center w-full">
                     <div className="w-14 h-14 rounded-full bg-[#178563] flex items-center justify-center text-white text-xl font-semibold">
                       {partnerName
                         .split(" ")
@@ -125,27 +132,23 @@ export default function ChatListPage() {
                         .join("")
                         .toUpperCase()}
                     </div>
-                    {chat.isNewMessage && (
-                      <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
+                    <div className="ml-4 flex-1">
+                      <h3 className="text-lg font-bold text-gray-900">
+                        {partnerName}
+                      </h3>
+                      <p className="text-sm text-gray-500 truncate">
+                        {chat.lastMessage || "Nessun messaggio disponibile"}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        Ultimo invio: {chat.updatedAt ? new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "N/D"}
+                      </p>
+                    </div>
+                    {isNewMessage && (
+                      <div
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full border-2 border-white"
+                        style={{ zIndex: 10 }}
+                      ></div>
                     )}
-                  </div>
-                  {/* Dettagli della chat */}
-                  <div className="ml-4 flex-1">
-                    <h3 className="text-lg font-bold text-gray-900">
-                      {partnerName}
-                    </h3>
-                    <p className="text-sm text-gray-500 truncate">
-                      {chat.lastMessage || "Nessun messaggio disponibile"}
-                    </p>
-                  </div>
-                  {/* Ultimo aggiornamento */}
-                  <div className="text-xs text-gray-400">
-                    {chat.updatedAt
-                      ? new Date(chat.updatedAt).toLocaleString([], {
-                          dateStyle: "short",
-                          timeStyle: "short",
-                        })
-                      : "N/D"}
                   </div>
                 </Card>
               );
