@@ -1,3 +1,5 @@
+//header
+
 import { useState, useEffect } from 'react';
 import { Search, Bell, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -29,6 +31,11 @@ export default function Header() {
     } catch (error) {
       console.error('Errore durante il logout:', error);
     }
+  };
+
+  // 🔔 Funzione per navigare alla pagina delle notifiche
+  const goToNotifications = () => {
+    navigate('/notifiche');
   };
 
   return (
@@ -80,7 +87,11 @@ export default function Header() {
 
         {/* Icone */}
         <div className="flex items-center space-x-4 relative">
-          <Bell className="text-green-600 cursor-pointer" />
+          {/* Campanella con evento click */}
+          <Bell 
+            className="text-green-600 cursor-pointer" 
+            onClick={goToNotifications} 
+          />
 
           {/* Menu dinamico per l'utente */}
           <div className="relative">
