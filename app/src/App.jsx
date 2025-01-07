@@ -20,13 +20,17 @@ import SupportoFem from './components/pages/SupportoFemminile';
 import Supporto from "./components/pages/Supporto";
 import ChatSupporto from './components/pages/ChatSupporto'; 
 import ChatListPage from "./components/pages/ChatListPage";
-
-
-
+import MeetingScheduler from './components/pages/MeetingScheduler';
+import CalendarioIncontri from './components/pages/CalendarioIncontri';
+import MeetingSummary from './components/pages/meeting-summary';
+import MeetingSummaryMentee from './components/pages/meeting-summaryformentee';
+import Menteestatistics from './components/pages/mentee-statistics';
+import CalendarioIncontriMentee from './components/pages/CalendarioIncontriMentee';
+import NotificationsPage from "@/components/pages/Notifica";
+import MentorshipPage from './components/pages/MentorshipPage';
 
 function App() {
   const db = app;
-  console.log(db);
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -41,21 +45,28 @@ function App() {
             <Route path="/HomePageUtente" element={<HomePageUtente />} />
             <Route path="/profile" element={<DettaglioProfilo/>} />
             <Route path="/edit-profile" element={<ModificaProfilo />}/>
+            <Route path="/personal-area" element={<MentorshipPage />} />
             <Route path="/mentorsearch" element={<MentorSearchForm />} />
             <Route path="/contents" element={<FileHomePage />} />
             <Route path="/videos" element={<Video />} />
             <Route path="/video/:id" element={<DettaglioVideo />} />
             <Route path="/matchingpage" element={<MatchingResultPage/>} />
+            <Route path="/Menteestatistics" element={<Menteestatistics />} />
+            <Route path="/CalendarMentee" element={<CalendarioIncontriMentee />} />
             <Route path="/supfem" element={<SupportoFem />} />
             <Route path="/support" element={<Supporto />} />
-            <Route path="/chat-support" element={<ChatSupporto />} /> {/* Nuova route */}
+            <Route path="/chat-support" element={<ChatSupporto />} />
             <Route path="/chat-support/:mentorId" element={<ChatSupporto />} />
             <Route path="/chat-list" element={<ChatListPage />} />
-
+            <Route path="/MeetingSummaryMentee/:meetingid" element={<MeetingSummaryMentee />} />
+            <Route path="/notifiche" element={<NotificationsPage />} />
           </Route>
           <Route element={<PrivateRoutes roles={["mentor"]}/>}>
             <Route path="/addfile" element={<FileAddDocument />} />
             <Route path="/InserireVideo" element={<InserireVideo />} />
+            <Route path="/MeetingScheduler" element={<MeetingScheduler />} />
+            <Route path="/Calendar" element={<CalendarioIncontri />} />
+            <Route path="/MeetingSummary/:meetingid" element={<MeetingSummary />} />
           </Route>
         </Routes>
       </BrowserRouter>
