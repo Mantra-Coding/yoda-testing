@@ -26,7 +26,7 @@ export default function Home() {
 
             {/* 3 White Boxes Section */}
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12 ml-4">  {/* Moved boxes to the left */}
-              <Card className="bg-white shadow-lg">
+              <Card className="bg-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:scale-x-105 hover:bg-[#0f5e45] hover:text-white border-none">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold">Esperienza Personalizzata</CardTitle>
                 </CardHeader>
@@ -34,7 +34,7 @@ export default function Home() {
                   <p>Ricevi consigli su misura da professionisti esperti nel tuo campo di interesse.</p>
                 </CardContent>
               </Card>
-              <Card className="bg-white shadow-lg">
+              <Card className="bg-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:scale-x-105 hover:bg-[#0f5e45] hover:text-white border-none">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold">Crescita Professionale</CardTitle>
                 </CardHeader>
@@ -42,7 +42,7 @@ export default function Home() {
                   <p>Sviluppa le tue competenze e avanza nella tua carriera con il supporto di mentori di successo.</p>
                 </CardContent>
               </Card>
-              <Card className="bg-white shadow-lg">
+              <Card className="bg-white shadow-lg transform transition-all duration-300 hover:scale-105 hover:scale-x-105 hover:bg-[#0f5e45] hover:text-white border-none">
                 <CardHeader>
                   <CardTitle className="text-xl font-semibold">Networking di Qualità</CardTitle>
                 </CardHeader>
