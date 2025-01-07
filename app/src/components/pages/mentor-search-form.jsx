@@ -121,7 +121,7 @@ export function MentorSearchForm() {
 
   const handleInclusion = () => {
     // Logica per gestire il pulsante di inclusione femminile
-    console.log("Navigazione verso l'area di inclusione femminile");
+    navigate("/supfem");
   };
 
   return (
@@ -348,12 +348,14 @@ export function MentorSearchForm() {
                         </div>
 
                         {/* Bottone */}
-                        <button
-                          className="inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-primary-foreground shadow px-4 w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-lg font-bold py-3 rounded-lg"
-                          onClick={() => console.log(`Contatta il mentore: ${mentor.nome}`)}
-                        >
-                          Contatta {mentor.nome?.split(" ")[0] || "il Mentore"}
-                        </button>
+                        <Button
+                            className="inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-primary-foreground shadow px-4 w-full h-14 bg-emerald-600 hover:bg-emerald-700 text-lg font-bold py-3 rounded-lg"
+                            onClick={() => {
+                            window.location.href = `/dettagli/${mentor.id}`; // Reindirizza alla pagina di visualizzazione del mentore
+                             }}
+>
+                            Profilo {mentor.nome?.split(" ")[0] || "il Mentore"}
+                            </Button>
                       </div>
                     ))}
                   </div>

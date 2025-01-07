@@ -71,6 +71,12 @@ export default function Header() {
           >
             AREA PERSONALE
           </Link>
+          <Link
+            to="/support"
+            className="text-sm text-green-700 hover:text-green-500 font-semibold tracking-wide uppercase"
+          >
+            SUPPORTO
+          </Link>
         </nav>
 
         {/* Barra di ricerca */}
