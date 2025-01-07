@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [userType, setUserType] = useState(null);
   const [isLogged, setIsLogged] = useState(false);
   const [nome, setNome] = useState(null);
+  const [cognome, setCognome] = useState(null);
   const [field, setField] = useState(null); // Aggiunto il campo `field`
   const [loading, setLoading] = useState(true);
 
@@ -33,6 +34,7 @@ export const AuthProvider = ({ children }) => {
           setUserType(userData.userType);
           setIsLogged(true);
           setNome(userData.nome);
+          setCognome(userData.cognome);
           setField(userData.field); // Aggiorna il valore di `field`
 
           // Persisti i dati nel localStorage
@@ -41,6 +43,7 @@ export const AuthProvider = ({ children }) => {
             JSON.stringify({
               userId: user.uid,
               nome: userData.nome,
+              cognome: userData.cognome,
               userType: userData.userType,
               isLogged: true,
               field: userData.field, // Aggiungi il campo `field`
@@ -53,6 +56,7 @@ export const AuthProvider = ({ children }) => {
         setUserType(null);
         setIsLogged(false);
         setNome(null);
+        setCognome(null);
         setField(null); // Resetta anche il campo `field`
         localStorage.removeItem("auth");
       }
@@ -67,6 +71,7 @@ export const AuthProvider = ({ children }) => {
       setUserType(userType);
       setIsLogged(isLogged);
       setNome(nome);
+      setCognome(cognome);
       setField(field); // Recupera il campo `field` dal localStorage
       setLoading(false);
     }
@@ -81,6 +86,7 @@ export const AuthProvider = ({ children }) => {
       setUserType(null);
       setIsLogged(false);
       setNome(null);
+      setCognome(null);
       setField(null); // Resetta anche il campo `field`
       localStorage.removeItem("auth");
     });
@@ -92,6 +98,7 @@ export const AuthProvider = ({ children }) => {
         userId,
         userType,
         nome,
+        cognome,
         field, // Aggiungi il campo `field` al contesto
         isLogged,
         logout,

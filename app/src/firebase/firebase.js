@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app"; 
 import { getStorage, connectStorageEmulator } from "firebase/storage";
-
+import { getFirestore } from "firebase/firestore"; // Aggiunto per Firestore
 // La tua configurazione Firebase
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_API_KEY,
@@ -14,7 +14,7 @@ const firebaseConfig = {
 
 // Inizializza Firebase
 const app = initializeApp(firebaseConfig);
-
+const db = getFirestore(app); 
 // Configura Firebase Storage
 const storage = getStorage(app);
 if (window.location.hostname === "localhost") {
@@ -23,5 +23,5 @@ if (window.location.hostname === "localhost") {
 }
 
 // Esporta app e storage
-export { app, storage };
+export { app, storage, db };
 export default app;
