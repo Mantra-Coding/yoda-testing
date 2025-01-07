@@ -30,48 +30,53 @@ export default function SupportoFemminile() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-500 to-white p-6 rounded-t-3xl">
+    <div className="min-h-screen bg-gradient-to-br from-[#178563] to-[#edf2f7]">
       <div className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
         <Header />
       </div>
 
-      <div className="container mx-auto max-w-6xl pt-16">
-        <div className="mb-12 text-center text-white">
-          <h1 className="mb-4 text-4xl font-bold">Rete di Supporto Femminile</h1>
-          <p className="mx-auto max-w-2xl">
+      <div className="container mx-auto max-w-6xl pt-24 space-y-12">
+        <div className="text-center text-white">
+          <h1 className="text-4xl font-bold mb-6">Rete di Supporto Femminile</h1>
+          <p className="text-lg max-w-3xl mx-auto">
             Offriamo un ambiente di supporto dedicato alle donne, fornendo mentorship, risorse e una
             comunità per crescere sia personalmente che professionalmente.
           </p>
         </div>
 
-        <div className="mb-8">
-          <h2 className="mb-4 text-2xl font-bold text-white">I Nostri Mentori e Aree di Supporto</h2>
-          <p className="text-white">
+        <div className="text-center text-white">
+          <h2 className="text-2xl font-bold mb-4">I Nostri Mentori e Aree di Supporto</h2>
+          <p className="text-lg max-w-2xl mx-auto">
             Scopri i nostri esperti mentori e le aree di supporto disponibili per il tuo sviluppo personale e professionale.
           </p>
         </div>
 
         {loading ? (
-          <p className="text-white">Caricamento in corso...</p>
+          <div className="flex items-center justify-center h-64">
+            <p className="text-white text-xl font-semibold animate-pulse">Caricamento in corso...</p>
+          </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {mentori.length > 0 ? (
               mentori.map((mentore) => (
-                <Card key={mentore.id} className="overflow-hidden">
+                <Card key={mentore.id} className="shadow-lg transition-transform transform hover:scale-105">
                   <CardContent className="p-6">
                     <div className="mb-6 flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#178563] to-[#22A699] flex items-center justify-center text-white text-2xl font-bold">
+                        {mentore.nome[0]}
+                      </div>
                       <div>
-                        <h3 className="font-semibold">
+                        <h3 className="text-lg font-bold text-gray-800">
                           {mentore.nome} {mentore.cognome}
                         </h3>
-                        <p className="text-sm text-gray-500">{mentore.occupazione}</p>
+                        <p className="text-sm text-gray-600">{mentore.occupazione}</p>
                       </div>
                     </div>
                     <div className="space-y-4">
-                      <h4 className="font-semibold text-emerald-700">Competenze:</h4>
+                      <h4 className="font-semibold text-[#178563]">Competenze:</h4>
                       <p className="text-sm text-gray-600">{mentore.competenze || "Non specificato"}</p>
                       <Button
-                        className="w-full bg-emerald-600 hover:bg-emerald-700"
+                        className="w-full bg-gradient-to-r from-[#22A699] to-[#178563] text-white font-semibold py-2 px-4 rounded-lg hover:scale-105 transition-transform"
                         onClick={() => {
                           window.location.href = `/dettagli/${mentore.id}`;
                         }}
@@ -83,7 +88,9 @@ export default function SupportoFemminile() {
                 </Card>
               ))
             ) : (
-              <p className="text-white">Nessun mentore trovato.</p>
+              <div className="text-center text-gray-700 col-span-full">
+                <p className="text-lg">Nessun mentore trovato.</p>
+              </div>
             )}
           </div>
         )}
