@@ -36,4 +36,3 @@ jobs:
           working-directory: ./app/
           component: true
           build: npm run build
-          start: npm start
