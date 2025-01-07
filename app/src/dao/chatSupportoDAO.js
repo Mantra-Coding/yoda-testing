@@ -8,7 +8,7 @@ const supportMessagesCollection = collection(db, "supportChatMessages");
 // Recupera le chat di un utente
 export async function getChatsByUserId(userId, userType) {
   try {
-    console.log("Tentativo di recupero chat per l'utente:", userId);
+    
 
     const chatsQuery = query(
       supportCollection,
@@ -19,19 +19,14 @@ export async function getChatsByUserId(userId, userType) {
     const chatsSnapshot = await getDocs(chatsQuery);
 
     if (chatsSnapshot.empty) {
-      console.warn("Nessuna chat trovata per l'utente:", userId);
       return { success: true, data: [] };
     }
 
     const chats = [];
     for (const chatDoc of chatsSnapshot.docs) {
       const chatData = chatDoc.data();
-      console.log("Chat trovata:", chatData);
+     
 
-      // Controlla che lastMessageSenderId esista
-      if (!chatData.lastMessageSenderId) {
-        console.warn(`La chat ${chatDoc.id} non contiene lastMessageSenderId.`);
-      }
 
       // Recupera i dettagli del mentee
       if (chatData.menteeId) {
@@ -62,10 +57,10 @@ export async function getChatsByUserId(userId, userType) {
       chats.push({ id: chatDoc.id, ...chatData });
     }
 
-    console.log("Chat elaborate:", chats);
+    
     return { success: true, data: chats };
   } catch (err) {
-    console.error("Errore durante il recupero delle chat:", err);
+  
     return { success: false, error: "Errore durante il recupero delle chat." };
   }
 }
@@ -98,7 +93,7 @@ export async function sendSupportMessage(message) {
   try {
     // Aggiungi il messaggio alla raccolta dei messaggi
     await addDoc(supportMessagesCollection, message);
-    console.log("Messaggio inviato:", message);
+   
 
     // Recupera il riferimento alla chat
     const chatDocRef = doc(db, "supportChat", message.chatId);
@@ -117,7 +112,7 @@ export async function sendSupportMessage(message) {
       lastMessageSenderId: message.senderId, // Aggiunge l'ID del mittente
     });
 
-    console.log("Chat aggiornata con l'ultimo messaggio e mittente:", message.text);
+    
   } catch (err) {
     console.error("Errore durante l'invio del messaggio di supporto:", err);
     throw new Error("Impossibile inviare il messaggio.");
@@ -176,7 +171,7 @@ export async function createChat(menteeId, mentorId, menteeName, mentorName) {
 
     // Se la chat non esiste, creane una nuova
     const chatId = generateChatId(menteeId, mentorId);
-    console.log("Creazione chat con ID:", chatId);
+    
 
     const newChat = {
       chatId,

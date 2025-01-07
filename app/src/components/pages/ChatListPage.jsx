@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { getChatsByUserId } from "@/dao/chatSupportoDAO";
 import { useAuth } from "@/auth/auth-context";
 import { useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
 import Header from "@/components/ui/Header";
 import {
   getFirestore,
