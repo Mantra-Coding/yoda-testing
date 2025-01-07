@@ -16,7 +16,7 @@ export default function Statistics() {
           setUser(userData); // Salva i dati dell'utente
           setMeetingsCount(userData.meetingsCount || 0); // Ottieni il meetingsCount (default a 0 se non esiste)
         } catch (error) {
-          console.error("Errore durante il recupero dei dati dell'utente:", error);
+          alert("Errore durante il recupero dei dati dell'utente:" + error);
         }
       };
   

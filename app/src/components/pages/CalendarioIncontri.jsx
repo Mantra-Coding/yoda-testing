@@ -16,10 +16,9 @@ const CalendarioIncontri = () => {
   const fetchMeetings = async () => {
     try {
       const fetchedMeetings = await fetchMeetingsForMentor(userId);
-      console.log('Incontri recuperati:', fetchedMeetings);
       setMeetings(fetchedMeetings);
     } catch (error) {
-      alert("Errore durante il recupero degli incontri.");
+      alert("Errore durante il recupero degli incontri." + error);
     }
   };
 
@@ -35,7 +34,7 @@ const CalendarioIncontri = () => {
       );
       setEditingMeeting(null);
     } catch (error) {
-      allert("Errore:");
+      alert("Errore:" + error);
     }
   };
   const handleDelete = async (meetingId,menteeId) => {
@@ -43,7 +42,7 @@ const CalendarioIncontri = () => {
       await deleteMeeting(meetingId,menteeId,userId,nome,cognome);
       setMeetings((prevMeetings) => prevMeetings.filter((m) => m.id !== meetingId));
     } catch (error) {
-      aller("Errore:");
+      alert("Errore:" + error);
     }
   };
 

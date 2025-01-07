@@ -35,11 +35,8 @@ export async function fetchMentorship(userId) {
                 };
             })
             .filter(session => session.mentoreId === userId || session.menteeId === userId); // Filtra per ID utente
-        
-        console.log("Sessioni di mentorship trovate:", sessions);
         return sessions;
     } catch (error) {
-        console.error("Errore nel recupero delle sessioni mentorship:", error);
         throw error;
     }
 }
@@ -49,11 +46,9 @@ export async function closeMentorshipSession(sessionId) {
         const sessionRef = doc(mentorshipSessionCollectionRef, sessionId);
         const meeting = await getById(sessionId);
         await updateDoc(sessionRef, { stato: "Inattivo" });
-        console.log(`Sessione di mentorship ${sessionId} chiusa con successo.`);
         await removeNotificationMentorship (meeting.mentoreId,meeting.menteeId,meeting.mentoreNome,meeting.mentoreCognome);
         await deleteDoc(sessionRef);
     } catch (error) {
-        console.error("Errore nella chiusura della sessione di mentorship:", error);
         throw error;
     }
 }
@@ -73,7 +68,6 @@ export async function getById(mentorshipId) {
             throw new Error("Mentorship non trovata!");
         }
     } catch (error) {
-        console.error("Errore durante il recupero della sessione mentorship", error);
         throw error; // Propaga l'errore al chiamante
     }
 }
@@ -113,11 +107,9 @@ export async function initializeMentorship(mentorId, menteeId) {
         };
 
         const docRef = await addDoc(mentorshipSessionCollectionRef, mentorship);
-        console.log("Mentorship creata con ID:", docRef.id);
         await acceptNotificationMentorship(mentorship.mentoreId, mentorship.menteeId, mentorship.mentoreNome, mentorship.mentoreCognome);
         return docRef.id;
     } catch (error) {
-        console.error("Errore nella creazione della sessione mentorship", error);
         throw error;
     }
 }
@@ -133,7 +125,6 @@ export async function getMentorById(mentorshipId) {
         const mentorshipData = await getById(mentorshipId);
         return mentorshipData.mentore;
     } catch (error) {
-        console.error("Errore nel recupero del mentore:", error);
         throw error; // Propaga l'errore al chiamante
     }
 }
@@ -150,7 +141,6 @@ export async function getMenteeById(mentorshipId) {
         const mentorshipData = await getById(mentorshipId);
         return mentorshipData.mentee;
     } catch (error) {
-        console.error("Errore nel recupero del mentee:", error);
         throw error; // Propaga l'errore al chiamante
     }
 }
@@ -170,7 +160,6 @@ export async function getByUser(userId) {
         );
         return userSessions;
     } catch (error) {
-        console.error("Errore nel recupero delle sessioni per l'utente:", error);
         throw error; // Propaga l'errore al chiamante
     }
 }
@@ -190,7 +179,6 @@ async function getAllMentorshipSessions() {
         }));
         return sessions;
     } catch (error) {
-        console.error("Errore nel recupero di tutte le sessioni mentorship:", error);
         throw error; // Propaga l'errore al chiamante
     }
 }

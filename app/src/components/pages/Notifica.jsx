@@ -25,7 +25,7 @@ export default function NotificationsPage() {
 
         setNotifications(sortedNotifications);
       } catch (error) {
-        console.error('Errore nel recupero delle notifiche:', error);
+        alert('Errore nel recupero delle notifiche:' + error);
       }
     };
 
@@ -38,7 +38,7 @@ export default function NotificationsPage() {
       await deleteNotifica(id);
       setNotifications((prev) => prev.filter((notification) => notification.id !== id));
     } catch (error) {
-      console.error('Errore nell\'eliminazione della notifica:', error);
+      alert('Errore nell\'eliminazione della notifica:' + error);
     }
   };
 

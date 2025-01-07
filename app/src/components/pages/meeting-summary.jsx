@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"; 
-import { useParams, useLocation } from "react-router-dom";
+import { useParams  } from "react-router-dom";
 import { fetchMeetingDetails, updateMeetingMinutes } from "@/dao/meetingsDAO";
 import Header from "@/components/ui/header";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ function MeetingSummary() {
       await updateMeetingMinutes(meetingid, minuta); // Aggiorna le note del meeting
       setSuccessMessage("Informazioni salvate con successo!");
     } catch (err) {
-      aller("Errore nel salvataggio delle note:");
+      alert("Errore nel salvataggio delle note:" + error);
     }
   };
 

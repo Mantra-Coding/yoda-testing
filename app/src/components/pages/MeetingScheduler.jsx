@@ -29,10 +29,10 @@ const MeetingScheduler = () => {
             }))
           );
         } else {
-          console.error("Dati non validi ricevuti dalla query");
+          alert("Dati non validi ricevuti dalla query");
         }
       } catch (error) {
-        console.error("Errore durante il recupero dei dati:", error);
+        alert("Errore durante il recupero dei dati:" + error);
       }
     };
 

@@ -41,8 +41,7 @@ async function handleRichiestaMentorship(user) {
 
   }
   catch (error){
-    console.log("notifica mentorship non inviata con successo");
-    console.error(error);
+    alert("notifica mentorship non inviata con successo" + error);
   }
 }
 

@@ -21,7 +21,7 @@ const MentorshipPage = () => {
                     const sessions = await fetchMentorship(userId);
                     setMentorshipSessions(sessions);
                 } catch (error) {
-                    console.error("Errore nel caricamento delle sessioni mentorship:", error);
+                    alert("Errore nel caricamento delle sessioni mentorship:" +  error);
                 } finally {
                     setLoading(false);
                 }

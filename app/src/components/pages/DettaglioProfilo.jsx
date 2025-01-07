@@ -17,7 +17,7 @@ export default function DettaglioProfilo() {
         const data = await getUserByID(userId); // Ottieni i dati utente
         setUserData(data); // Salva i dati nello stato
       } catch (error) {
-        console.error("Errore durante il recupero dei dati utente:", error.message);
+        alert("Errore durante il recupero dei dati utente:" +  error.message);
       } finally {
         setIsLoading(false); // Fine caricamento
       }

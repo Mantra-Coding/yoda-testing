@@ -16,7 +16,7 @@ const CalendarioIncontri = () => {
       const fetchedMeetings = await fetchMeetingsForMentee(userId);
       setMeetings(fetchedMeetings);
     } catch (error) {
-      alert("Errore durante il recupero degli incontri.");
+      alert("Errore durante il recupero degli incontri." + error);
     }
   };
 
