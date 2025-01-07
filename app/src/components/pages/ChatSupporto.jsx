@@ -7,7 +7,6 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/ui/Header";
 import { useAuth } from "@/auth/auth-context";
 
-
 const db = getFirestore(app);
 
 export default function ChatSupporto() {
@@ -64,7 +63,6 @@ export default function ChatSupporto() {
           setMenteeName(chatData.menteeName || "Mentee Sconosciuto");
           setMentorName(chatData.mentorName || "Mentore Sconosciuto");
 
-          // Imposta i dettagli dell'utente con cui si sta parlando
           if (userType === "mentor") {
             setUser({
               nome: chatData.menteeName.split(" ")[0],
@@ -84,7 +82,6 @@ export default function ChatSupporto() {
           setMessage("Ciao, ti contatto per il seguente problema: " + problemType);
         }
 
-        // Recupera i messaggi salvati
         const savedMessages = await getSupportMessages(chatId);
         setMessages(savedMessages);
       } catch (err) {
@@ -135,17 +132,19 @@ export default function ChatSupporto() {
       <Header />
       <div className="container mx-auto py-6 space-y-6 text-white">
         {loading ? (
-          <div>Caricamento...</div>
+          <div className="flex items-center justify-center h-[70vh] text-xl font-semibold animate-pulse">
+            Caricamento in corso...
+          </div>
         ) : (
           <>
             <Card className="w-full max-w-5xl mx-auto shadow-lg rounded-lg overflow-hidden">
-              <CardHeader className="bg-[#178563] text-white py-6 px-8">
+              <CardHeader className="bg-gradient-to-r from-[#178563] to-[#22A699] text-white py-6 px-8">
                 <div className="flex items-center space-x-6">
-                  <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center text-[#178563] text-3xl font-bold">
+                  <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center text-[#178563] text-3xl font-bold">
                     {user.nome[0]}{user.cognome[0]}
                   </div>
                   <div className="flex flex-col">
-                    <h2 className="text-3xl font-bold mb-2">
+                    <h2 className="text-3xl font-bold mb-1">
                       {userType === "mentor" ? "Profilo del Mentee" : "Profilo del Mentore"}
                     </h2>
                     <CardTitle className="text-2xl font-semibold">
@@ -153,7 +152,7 @@ export default function ChatSupporto() {
                     </CardTitle>
                     <p className="text-lg font-medium">{user.occupazione}</p>
                     {problemType && problemType !== "Non specificato" && (
-                      <p className="text-gray-200 mt-2">
+                      <p className="text-sm text-gray-200 mt-2">
                         Stai discutendo del problema: {problemType}
                       </p>
                     )}
@@ -162,7 +161,7 @@ export default function ChatSupporto() {
               </CardHeader>
             </Card>
 
-            <div className="w-full max-w-5xl mx-auto bg-white p-6 rounded-lg shadow flex flex-col space-y-4">
+            <div className="w-full max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md flex flex-col space-y-4">
               <div className="flex-1 overflow-y-auto border rounded-lg p-6 bg-gray-50 shadow-inner h-[500px]">
                 {messages.length > 0 ? (
                   messages.map((msg, index) => (
@@ -173,7 +172,7 @@ export default function ChatSupporto() {
                       }`}
                     >
                       {msg.senderId !== userId && (
-                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#178563] flex items-center justify-center text-white text-sm font-bold mr-2">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-[#178563] to-[#22A699] flex items-center justify-center text-white text-sm font-bold mr-2">
                           {userType === "mentor" ? menteeName[0] : mentorName[0]}
                         </div>
                       )}
@@ -193,7 +192,7 @@ export default function ChatSupporto() {
                         </span>
                       </div>
                       {msg.senderId === userId && (
-                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#178563] flex items-center justify-center text-white text-sm font-bold ml-2">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-r from-[#178563] to-[#22A699] flex items-center justify-center text-white text-sm font-bold ml-2">
                           TU
                         </div>
                       )}
@@ -214,7 +213,7 @@ export default function ChatSupporto() {
                 />
                 <button
                   onClick={handleSendMessage}
-                  className="px-6 py-3 bg-[#22A699] text-white font-semibold rounded-lg shadow-md hover:bg-[#178563] transition"
+                  className="px-6 py-3 bg-gradient-to-r from-[#22A699] to-[#178563] text-white font-semibold rounded-lg shadow-md hover:scale-105 transition-transform"
                 >
                   Invia
                 </button>
