@@ -126,9 +126,8 @@ export async function createNotification(mittenteId, destinatarioId, oggetto, co
     };
 
     await addDoc(notificationsCollectionRef, newNotification);
-    console.log(`Notifica "${oggetto}" creata con successo!`);
   } catch (error) {
-    console.error('Errore nella creazione della notifica:', error);
+    alert('Errore nella creazione della notifica:' + error);
     throw error;
   }
 }
@@ -145,12 +144,10 @@ export async function removeExpiredNotifications() {
     // Itera su ogni notifica e elimina quelle scadute
     querySnapshot.forEach(async (doc) => {
       await deleteDoc(doc.ref);
-      console.log(`Notifica ${doc.id} eliminata perché scaduta.`);
     });
 
-    console.log("Pulizia delle notifiche scadute completata.");
   } catch (error) {
-    console.error("Errore durante la rimozione delle notifiche scadute:", error);
+    alert("Errore durante la rimozione delle notifiche scadute:" +  error);
     throw error;
   }
 }
@@ -167,7 +164,6 @@ export const getByDest = async (userId) => {
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
-    console.error('Errore durante il recupero delle notifiche:', error);
     throw error;
   }
 };
@@ -188,7 +184,6 @@ export const getById = async (id) => {
       throw new Error('Nessuna notifica trovata con questo ID');
     }
   } catch (error) {
-    console.error('Errore durante il recupero della notifica:', error);
     throw error;
   }
 };
@@ -202,7 +197,6 @@ export const deleteNotifica = async (id) => {
     const docRef = doc(db, 'notifiche', id);
     await deleteDoc(docRef);
   } catch (error) {
-    console.error('Errore durante l\'eliminazione della notifica:', error);
     throw error;
   }
 };
